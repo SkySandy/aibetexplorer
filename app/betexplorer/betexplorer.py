@@ -5,6 +5,7 @@ from concurrent.futures import Future, ProcessPoolExecutor
 from contextlib import nullcontext
 import datetime
 from multiprocessing import Manager
+from multiprocessing.synchronize import Lock as MultiLock
 import re
 import signal
 from typing import TYPE_CHECKING, Any, Callable, Final, List, Optional
@@ -794,7 +795,7 @@ async def get_championships(
         country: CountryBetexplorer,
         updated_years: list[str],
         fast_country: dict[str, int],
-        lock,
+        lock: MultiLock,
 ) -> None:
     """Загрузка матчей.
 
@@ -822,7 +823,7 @@ async def get_championships(
 
     async with db.get_session() if save_database != DATABASE_NOT_USE else nullcontext() as session:
         load_seasons: Optional[ReceivedData]
-        if (load_seasons := await ls.get_read(country['country_url'], CSS_CHAMPIONSHIPS)) is not None:
+        if (load_seasons := await ls.get_read(country['country_url'], CSS_CHAMPIONSHIPS, True)) is not None:
             championships: list[ChampionshipBetexplorer] = parsing_championships(
                 load_seasons, sport_id.value, country['country_id'])
             await crd.insert_championship(session, sport_id, country['country_id'], championships)
@@ -850,10 +851,12 @@ async def get_championships(
                                 await get_team(
                                     ls, crd,
                                     session, [match['home_team'], match['away_team']], fast_country, fast_team)
-                    await crd.insert_match(session, championship['championship_id'], results['matches'])
+                    # async with session.begin():
+                    #     await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
+                    #     await crd.add_matches(session, championship['championship_id'], results['matches'])
+                # break
     await db.close()
     await ls.close_session()
-    # await self.insert_championship_stage(session, championship['championship_id'], results['stages'])
     # await ls.get_read(
     #     self, urljoin('/match-odds/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/'),
     #     '',
@@ -912,7 +915,7 @@ async def load_data(
         root_dir=root_dir,
     )
     manager: SyncManager = Manager()
-    lock = manager.Lock()
+    lock: MultiLock = manager.Lock()
     await ls.load_data(load_net=load_net, lock=lock)
 
     db = DatabaseSessionManager()
@@ -931,20 +934,27 @@ async def load_data(
         sport_id: SportType
         for sport_id in sport_type:
             load_countries: Optional[ReceivedData]
-            if (load_countries := await ls.get_read(sports_url[sport_id], CSS_COUNTRIES)) is not None:
+            if (load_countries := await ls.get_read(sports_url[sport_id], CSS_COUNTRIES, True)) is not None:
                 countries: List[CountryBetexplorer] = parsing_countries(load_countries)
                 await crd.country_insert_all(session, sport_id, countries)
                 fast_country: dict[str, int] = {country['country_name']: country['country_id'] for country in countries}
                 country: CountryBetexplorer
                 for country in list(filter(lambda x: x['country_name'] not in exclude_countries, countries)):
-                    futures.append(loop.run_in_executor(  # noqa: PERF401
-                        pool, wrapper, get_championships,
-                        root_dir, database, config_engine, load_net, save_database,
-                        sport_id, country, updated_years, fast_country, lock)  # noqa: COM812
-                    )
+                    if processes == 1:
+                        await get_championships(
+                            root_dir, database, config_engine, load_net, save_database,
+                            sport_id, country, updated_years, fast_country, lock
+                        )
+                    else:
+                        futures.append(loop.run_in_executor(  # noqa: PERF401
+                            pool, wrapper, get_championships,
+                            root_dir, database, config_engine, load_net, save_database,
+                            sport_id, country, updated_years, fast_country, lock)  # noqa: COM812
+                        )
                     # break
             # break
-    await asyncio.wait(futures)
+    if futures:
+        await asyncio.wait(futures)
     await crd.analyze_match(session)
 
     pool.shutdown()
