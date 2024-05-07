@@ -125,6 +125,8 @@ class LoadSave():
                             # r.raise_for_status()
                         try:
                             creation_date = parsedate_to_datetime(r.headers['Date'])
+                            if creation_date.tzinfo is not None and creation_date.tzinfo.utcoffset(creation_date) is not None:
+                                creation_date = creation_date.replace(tzinfo=None) + datetime.timedelta(hours=3)
                         except (ValueError, KeyError):
                             creation_date: datetime.datetime = datetime.datetime.now()
                         if not is_bytes:
