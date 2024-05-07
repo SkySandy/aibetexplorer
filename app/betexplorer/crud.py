@@ -259,7 +259,7 @@ class CRUDbetexplorer:
 
         :param session: Текущая сессия
         """
-        await self.analyze_tables(session, [Championship, Match, TimeScore, Shooter, Team])
+        await self.analyze_tables(session, [Championship, Match, TimeScore, Shooter, Team, ChampionshipStage])
 
     async def insert_championship(self,
                                   session: AsyncSession,
@@ -397,11 +397,12 @@ class CRUDbetexplorer:
             team['team_id'] = team_rec.team_id
             return team_rec.team_id
 
-    async def insert_match(self,
-                           session: AsyncSession,
-                           championship_id: int,
-                           matches: list[MatchBetexplorer],
-                           ) -> None:
+    async def add_matches(
+            self,
+            session: AsyncSession,
+            championship_id: int,
+            matches: list[MatchBetexplorer],
+            ) -> None:
         """Добавить информацию о результатах матчей в базу данных.
 
         :param session: Текущая сессия
@@ -440,110 +441,109 @@ class CRUDbetexplorer:
                         match['match_id'] = row.match_id
             return
 
-        async with session.begin():
-            # for row in (await session.scalars(
-            #         select(Match).where(
-            #             Match.championship_id == championship_id))).unique():
-            #     if (match := match_unused.pop(
-            #             (row.championship_id, row.round_name, row.home_team_id, row.away_team_id,
-            #              row.game_date, row.home_score, row.away_score,
-            #              row.odds_1, row.odds_x, row.odds_2), None)) is not None:
-            #         match['match_id'] = row.match_id
+        # for row in (await session.scalars(
+        #         select(Match).where(
+        #             Match.championship_id == championship_id))).unique():
+        #     if (match := match_unused.pop(
+        #             (row.championship_id, row.round_name, row.home_team_id, row.away_team_id,
+        #              row.game_date, row.home_score, row.away_score,
+        #              row.odds_1, row.odds_x, row.odds_2), None)) is not None:
+        #         match['match_id'] = row.match_id
 
-            match_insert = [Match(
-                championship_id=championship_id,
-                match_url=match['match_url'],
-                home_team_id=match['home_team']['team_id'],
-                home_team_emblem=match['home_team_emblem'],
-                away_team_id=match['away_team']['team_id'],
-                away_team_emblem=match['away_team_emblem'],
-                home_score=match['home_score'],
-                away_score=match['away_score'],
+        match_insert = [Match(
+            championship_id=championship_id,
+            match_url=match['match_url'],
+            home_team_id=match['home_team']['team_id'],
+            home_team_emblem=match['home_team_emblem'],
+            away_team_id=match['away_team']['team_id'],
+            away_team_emblem=match['away_team_emblem'],
+            home_score=match['home_score'],
+            away_score=match['away_score'],
 
-                odds_1=match['odds_1'],
-                odds_x=match['odds_x'],
-                odds_2=match['odds_2'],
+            odds_1=match['odds_1'],
+            odds_x=match['odds_x'],
+            odds_2=match['odds_2'],
 
-                game_date=match['game_date'],
-                score_stage=match['score_stage'],
-                score_stage_short=match['score_stage_short'],
+            game_date=match['game_date'],
+            score_stage=match['score_stage'],
+            score_stage_short=match['score_stage_short'],
 
-                is_fixture=match['is_fixture'],
-                stage_name=match['stage_name'],
-                round_name=match['round_name'],
-                round_number=match['round_number'],
-                download_date=match['download_date'],
-                save_date=match['save_date'],
-                time_score=[
-                    TimeScore(
-                        half_number=score_halves['half_number'],
-                        home_score=score_halves['home_score'],
-                        away_score=score_halves['away_score'],
-                    ) for score_halves in match['score_halves']
-                ],
-                shooter=[
-                    Shooter(
-                        home_away=shooter['home_away'],
-                        event_time=shooter['event_time'],
-                        overtime=shooter['overtime'],
-                        player_name=shooter['player_name'],
-                        penalty_kick=shooter['penalty_kick'],
-                        event_order=shooter['event_order'],
-                    ) for shooter in match['shooters']
-                ],
-            ) for match in match_unused.values()]
+            is_fixture=match['is_fixture'],
+            stage_name=match['stage_name'],
+            round_name=match['round_name'],
+            round_number=match['round_number'],
+            download_date=match['download_date'],
+            save_date=match['save_date'],
+            time_score=[
+                TimeScore(
+                    half_number=score_halves['half_number'],
+                    home_score=score_halves['home_score'],
+                    away_score=score_halves['away_score'],
+                ) for score_halves in match['score_halves']
+            ],
+            shooter=[
+                Shooter(
+                    home_away=shooter['home_away'],
+                    event_time=shooter['event_time'],
+                    overtime=shooter['overtime'],
+                    player_name=shooter['player_name'],
+                    penalty_kick=shooter['penalty_kick'],
+                    event_order=shooter['event_order'],
+                ) for shooter in match['shooters']
+            ],
+        ) for match in match_unused.values()]
 
-            session.add_all(match_insert)
-            # modified: bool = self.has_uncommitted_changes(session)
-            # await session.flush()
-            # for row in match_insert:
-            #     match = match_unused[
-            #         (row.championship_id, row.round_name, row.home_team_id, row.away_team_id,
-            #          row.game_date, row.home_score, row.away_score,
-            #          row.odds_1, row.odds_x, row.odds_2)]
-            #     match['match_id'] = row.match_id
-            #     for index, item in enumerate(row.time_score):
-            #         match['score_halves'][index].update({'time_id': item.time_id})
-            #     for index, item in enumerate(row.shooter):
-            #         match['shooters'][index].update({'shooter_id': item.shooter_id})
+        session.add_all(match_insert)
+        # modified: bool = self.has_uncommitted_changes(session)
+        # await session.flush()
+        # for row in match_insert:
+        #     match = match_unused[
+        #         (row.championship_id, row.round_name, row.home_team_id, row.away_team_id,
+        #          row.game_date, row.home_score, row.away_score,
+        #          row.odds_1, row.odds_x, row.odds_2)]
+        #     match['match_id'] = row.match_id
+        #     for index, item in enumerate(row.time_score):
+        #         match['score_halves'][index].update({'time_id': item.time_id})
+        #     for index, item in enumerate(row.shooter):
+        #         match['shooters'][index].update({'shooter_id': item.shooter_id})
 
-        # if modified:
-        #     await self.analyze_tables(session, [Match, TimeScore, Shooter])
+    # if modified:
+    #     await self.analyze_tables(session, [Match, TimeScore, Shooter])
 
-    async def insert_championship_stage(self,
-                                        session: AsyncSession,
-                                        championship_id: int,
-                                        championship_stage: ChampionshipStageBetexplorer,
-                                        ) -> Optional[int]:
+    async def add_championship_stages(
+            self,
+            session: AsyncSession,
+            championship_id: int,
+            championship_stages: list[ChampionshipStageBetexplorer],
+        ) -> Optional[int]:
         """Вставить стадию чемпионата в базу данных.
 
         :param session: Текущая сессия
         :param championship_id: Идентификатор чемпионата
-        :param championship_stage: Информация о стадии чемпионата
+        :param championship_stages: Информация о стадии чемпионата
 
         :return: Идентификатор матча
         """
         if self.save_database == DATABASE_NOT_USE:
             return None
-        if self.save_database == DATABASE_READ_ONLY:
-            async with session.begin():
-                stage_id: int = await session.scalar(
-                    select(ChampionshipStage.stage_id).where(
-                        ChampionshipStage.championship_id == championship_id,
-                        ChampionshipStage.stage_name == championship_stage['stage_name'],
-                    ),
-                )
-                championship_stage['stage_id'] = stage_id
-                return stage_id
-        async with session.begin():
-            match_insert = ChampionshipStage(
-                championship_id=championship_id,
-                stage_url=championship_stage['stage_url'],
-                stage_name=championship_stage['stage_name'],
-                stage_order=championship_stage['stage_order'],
-                stage_current=championship_stage['stage_current'],
-            )
-            session.add(match_insert)
-            await session.flush()
-            championship_stage['stage_id'] = match_insert.stage_id
-            return match_insert.stage_id
+        # if self.save_database == DATABASE_READ_ONLY:
+        #     async with session.begin():
+        #         stage_id: int = await session.scalar(
+        #             select(ChampionshipStage.stage_id).where(
+        #                 ChampionshipStage.championship_id == championship_id,
+        #                 ChampionshipStage.stage_name == championship_stage['stage_name'],
+        #             ),
+        #         )
+        #         championship_stage['stage_id'] = stage_id
+        #         return stage_id
+        match_insert = [ChampionshipStage(
+            championship_id=championship_id,
+            stage_url=championship_stage['stage_url'],
+            stage_name=championship_stage['stage_name'],
+            stage_order=championship_stage['stage_order'],
+            stage_current=championship_stage['stage_current'],
+        ) for championship_stage in championship_stages]
+        session.add_all(match_insert)
+        # await session.flush()
+        # championship_stage['stage_id'] = match_insert.stage_id
+        # return match_insert.stage_id
