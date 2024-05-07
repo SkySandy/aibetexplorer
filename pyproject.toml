@@ -1,0 +1,147 @@
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+# Same as Black.
+line-length = 119
+indent-width = 4
+
+# Assume Python 3.11
+target-version = "py311"
+
+src = ["app"]
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E1", "E2", "E3", "E4", "E5", "E7", "E9", "W", "F", "C90", "B", "Q", "I", "RUF", "N", "D", "YTT", "ANN", "ASYNC", "TRIO", "S", "BLE", "FBT", "A", "COM", "C4", "DTZ", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "PYI", "PT", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "TD", "FIX", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG"]
+ignore = ["D203", "D213", "ANN101", "D107", "ANN401"]
+allowed-confusables = ["−", "ρ", "∗", "о", "с", "б", "н", "Н", "е", "а"]
+
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "single"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "single"
+
+[tool.ruff.lint.per-file-ignores]
+"test_crud.py" = [
+    # at least this three should be fine in tests:
+    "S101", # asserts allowed in tests...
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    # The below are debateable
+    "PLR2004", # Magic value used in comparison, ...
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "PLR6301", # Checks for the presence of unused self parameter in methods definitions
+]
+"test_database.py" = [
+    # at least this three should be fine in tests:
+    "S101", # asserts allowed in tests...
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    # The below are debateable
+    "PLR2004", # Magic value used in comparison, ...
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "PLR6301", # Checks for the presence of unused self parameter in methods definitions
+]
+"test_parser.py" = [
+    # at least this three should be fine in tests:
+    "S101", # asserts allowed in tests...
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    # The below are debateable
+    "PLR2004", # Magic value used in comparison, ...
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "PLR6301", # Checks for the presence of unused self parameter in methods definitions
+    "ANN201", #  Checks that public functions and methods have return type annotations.
+]
+"config.py" = [
+    "F401", # imported but unused
+    "ERA001", # Found commented-out code
+    "PTH1", # should be replaced by `Path`
+    "DTZ001", # `datetime.datetime()` called without a `tzinfo` argument
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"] # Список модулей, которые следует рассматривать как собственные
+case-sensitive = true # Импорт с учетом регистра
+combine-as-imports = true # Объединяет импорт в одной строке
+force-wrap-aliases = false # импорт с псевдонимом from на отдельной строке
+force-sort-within-sections = true # Не сортируйте импорт в прямом стиле (например, import sys) перед импортом из стиля (например, from itertools import groupby)
+section-order = [
+    "standard-library",
+    "future",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+default-section = "third-party" # раздел по умолчанию импорта, который не вписывается в указанный файл section-order
+constants = ["SPORTS"] # Всегда распознается как КОНСТАНТА order-by-type не зависимо от регистра
+force-single-line = false # Для каждого импорта отдельная строка
+extra-standard-library = ["path"] # Список модулей, которые следует учитывать в стандартной библиотеке, в дополнение к заранее известным
+forced-separate = ["tests"]  # Список модулей для разделения на вспомогательные блоки импорта в указанном порядке
+
+[tool.pytest]
+log_cli = true

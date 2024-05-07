@@ -1,0 +1,274 @@
+<div class="columns__item columns__item--68 columns__item--tab-100">
+
+<section class="wrap-section">
+	<ul class="list-breadcrumb">
+<li class="list-breadcrumb__item"><a href="/" class="list-breadcrumb__item__in">Home</a></li>
+<li class="list-breadcrumb__item"><a href="/football/" class="list-breadcrumb__item__in">Football</a></li>
+<li class="list-breadcrumb__item"><a href="/football/england/" class="list-breadcrumb__item__in">England</a></li>
+<li class="list-breadcrumb__item"><span class="list-breadcrumb__item__in">FA Cup 2023/2024</span></li>
+</ul>
+<header class="wrap-section__header">
+<figure class="wrap-section__header__image"><img src="/res/images/flags/1x1/198.svg" alt="England"></figure>
+<h1 class="wrap-section__header__title"><span class="tablet-desktop-only">FA Cup 2023/2024</span><span class="mobile-only">FA Cup</span> </h1>
+<div class="wrap-section__header__select"><select onchange="window.location.href=this.options[this.selectedIndex].value"><option value="/football/england/fa-cup-2024-2025/">2024/2025</option><option value="/football/england/fa-cup/" selected="selected">2023/2024</option><option value="/football/england/fa-cup-2022-2023/">2022/2023</option><option value="/football/england/fa-cup-2021-2022/">2021/2022</option><option value="/football/england/fa-cup-2020-2021/">2020/2021</option><option value="/football/england/fa-cup-2019-2020/">2019/2020</option><option value="/football/england/fa-cup-2018-2019/">2018/2019</option><option value="/football/england/fa-cup-2017-2018/">2017/2018</option><option value="/football/england/fa-cup-2016-2017/">2016/2017</option><option value="/football/england/fa-cup-2015-2016/">2015/2016</option><option value="/football/england/fa-cup-2014-2015/">2014/2015</option><option value="/football/england/fa-cup-2013-2014/">2013/2014</option><option value="/football/england/fa-cup-2012-2013/">2012/2013</option><option value="/football/england/fa-cup-2011-2012/">2011/2012</option><option value="/football/england/fa-cup-2010-2011/">2010/2011</option><option value="/football/england/fa-cup-2009-2010/">2009/2010</option><option value="/football/england/fa-cup-2008-2009/">2008/2009</option><option value="/football/england/fa-cup-2007-2008/">2007/2008</option><option value="/football/england/fa-cup-2006-2007/">2006/2007</option><option value="/football/england/fa-cup-2005-2006/">2005/2006</option><option value="/football/england/fa-cup-2004-2005/">2004/2005</option><option value="/football/england/fa-cup-2003-2004/">2003/2004</option><option value="/football/england/fa-cup-2002-2003/">2002/2003</option><option value="/football/england/fa-cup-2001-2002/">2001/2002</option><option value="/football/england/fa-cup-2000-2001/">2000/2001</option><option value="/football/england/fa-cup-1999-2000/">1999/2000</option><option value="/football/england/fa-cup-1998-1999/">1998/1999</option></select></div></header>
+<div class="box-overflow"><div class="box-overflow__in"><ul class="list-tabs">
+<li class="list-tabs__item"><a href="/football/england/fa-cup/" class="list-tabs__item__in">Summary</a></li>
+<li class="list-tabs__item"><a href="/football/england/fa-cup/results/" class="list-tabs__item__in">Results</a></li>
+<li class="list-tabs__item"><a href="/football/england/fa-cup/fixtures/" class="list-tabs__item__in current">Fixtures</a></li>
+<li class="list-tabs__item"><a href="/football/england/fa-cup/stats/" class="list-tabs__item__in">Stats</a></li>
+<li class="list-tabs__item"><a href="/football/england/fa-cup/mutual-matches/" class="list-tabs__item__in"><span class="tablet-desktop-only">Head-to-head</span><span class="mobile-only">H2H</span></a></li>
+</ul></div></div>
+<div class="h-mb15">
+<div class="box-overflow" id="sm-0-0"><div class="box-overflow__in"><ul class="list-tabs list-tabs--secondary">
+<li class="list-tabs__item"><a href="?stage=8z4wQG6n" title="" class="list-tabs__item__in">Qualification</a></li>
+<li class="list-tabs__item"><a href="?stage=ED4ZQdit" title="Main season game statistics" class="list-tabs__item__in current">Main</a></li>
+</ul></div></div>
+</div>
+<script language="Javascript">
+var smActiveGroup = 0;
+var smActiveCountry = 0;
+</script>
+<div class="wrap-header" id="league-summary-fixtures">
+<ul class="wrap-header__list"><li class="wrap-header__list__item">Sort by:</li><li class="wrap-header__list__item short"><select onchange="league_fixtures_change('1,SpmmSGak,ED4ZQdit,1')" id="js-leaguefixtures-sort"><option value="d">date</option><option value="r" selected="selected">round</option></select></li></ul>
+</div>
+<div id="js-leaguefixtures-all">
+<div class="box-overflow"><div class="box-overflow__in">
+<table class="table-main table-main--leaguefixtures h-mb15 js-tablebanner-t js-tablebanner-ntb">
+<tbody><tr><th class="h-text-left" colspan="2">1/16-finals - 1st leg</th><th>&nbsp;</th><th class="table-main__bs">B's</th><th class="h-text-center">1</th><th class="h-text-center">X</th><th class="h-text-center">2</th></tr>
+<tr>
+<td class="table-main__datetime">25.01. 20:45</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/bournemouth-swansea/vkf6rY3C/" class="in-match"><span>Bournemouth</span> - <span>Swansea</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70dxv464x0xikni7"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=vkf6rY3C&amp;outcomeid=6u70dxv464x0xikni7&amp;otheroutcomes=6u70dxv498x0x0,6u70dxv464x0xikni8');" title="Add to My Selections" data-odd="1.28"></button></td>
+<td class="table-main__odds" data-oid="6u70dxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=vkf6rY3C&amp;outcomeid=6u70dxv498x0x0&amp;otheroutcomes=6u70dxv464x0xikni7,6u70dxv464x0xikni8');" title="Add to My Selections" data-odd="5.64"></button></td>
+<td class="table-main__odds" data-oid="6u70dxv464x0xikni8"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=vkf6rY3C&amp;outcomeid=6u70dxv464x0xikni8&amp;otheroutcomes=6u70dxv464x0xikni7,6u70dxv498x0x0');" title="Add to My Selections" data-odd="9.61"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">26.01. 20:45</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/bristol-city-nottingham/SpLxzVPI/" class="in-match"><span>Bristol City</span> - <span>Nottingham</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6upfmxv464x0ximcfs"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=SpLxzVPI&amp;outcomeid=6upfmxv464x0ximcfs&amp;otheroutcomes=6upfmxv498x0x0,6upfmxv464x0ximcft');" title="Add to My Selections" data-odd="3.43"></button></td>
+<td class="table-main__odds" data-oid="6upfmxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=SpLxzVPI&amp;outcomeid=6upfmxv498x0x0&amp;otheroutcomes=6upfmxv464x0ximcfs,6upfmxv464x0ximcft');" title="Add to My Selections" data-odd="3.46"></button></td>
+<td class="table-main__odds" data-oid="6upfmxv464x0ximcft"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=SpLxzVPI&amp;outcomeid=6upfmxv464x0ximcft&amp;otheroutcomes=6upfmxv464x0ximcfs,6upfmxv498x0x0');" title="Add to My Selections" data-odd="2.06"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">&nbsp;</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/chelsea-aston-villa/nFcEtCYO/" class="in-match"><span>Chelsea</span> - <span>Aston Villa</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70fxv464x0xikni9"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=nFcEtCYO&amp;outcomeid=6u70fxv464x0xikni9&amp;otheroutcomes=6u70fxv498x0x0,6u70fxv464x0xiknia');" title="Add to My Selections" data-odd="2.05"></button></td>
+<td class="table-main__odds" data-oid="6u70fxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=nFcEtCYO&amp;outcomeid=6u70fxv498x0x0&amp;otheroutcomes=6u70fxv464x0xikni9,6u70fxv464x0xiknia');" title="Add to My Selections" data-odd="3.61"></button></td>
+<td class="table-main__odds" data-oid="6u70fxv464x0xiknia"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=nFcEtCYO&amp;outcomeid=6u70fxv464x0xiknia&amp;otheroutcomes=6u70fxv464x0xikni9,6u70fxv498x0x0');" title="Add to My Selections" data-odd="3.40"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">&nbsp;</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/sheffield-wed-coventry/0be2qEl6/" class="in-match"><span>Sheffield Wed</span> - <span>Coventry</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70cxv464x0xikni5"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=0be2qEl6&amp;outcomeid=6u70cxv464x0xikni5&amp;otheroutcomes=6u70cxv498x0x0,6u70cxv464x0xikni6');" title="Add to My Selections" data-odd="2.96"></button></td>
+<td class="table-main__odds" data-oid="6u70cxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=0be2qEl6&amp;outcomeid=6u70cxv498x0x0&amp;otheroutcomes=6u70cxv464x0xikni5,6u70cxv464x0xikni6');" title="Add to My Selections" data-odd="3.51"></button></td>
+<td class="table-main__odds" data-oid="6u70cxv464x0xikni6"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=0be2qEl6&amp;outcomeid=6u70cxv464x0xikni6&amp;otheroutcomes=6u70cxv464x0xikni5,6u70cxv498x0x0');" title="Add to My Selections" data-odd="2.26"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">26.01. 21:00</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/tottenham-manchester-city/K2SSaZYn/" class="in-match"><span>Tottenham</span> - <span>Manchester City</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70ixv464x0xiknih"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=K2SSaZYn&amp;outcomeid=6u70ixv464x0xiknih&amp;otheroutcomes=6u70ixv498x0x0,6u70ixv464x0xiknii');" title="Add to My Selections" data-odd="4.84"></button></td>
+<td class="table-main__odds" data-oid="6u70ixv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=K2SSaZYn&amp;outcomeid=6u70ixv498x0x0&amp;otheroutcomes=6u70ixv464x0xiknih,6u70ixv464x0xiknii');" title="Add to My Selections" data-odd="4.36"></button></td>
+<td class="table-main__odds" data-oid="6u70ixv464x0xiknii"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=K2SSaZYn&amp;outcomeid=6u70ixv464x0xiknii&amp;otheroutcomes=6u70ixv464x0xiknih,6u70ixv498x0x0');" title="Add to My Selections" data-odd="1.60"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">27.01. 13:30</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/ipswich-maidstone/6a2gozKg/" class="in-match"><span>Ipswich</span> - <span>Maidstone</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70axv464x0xikni1"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=6a2gozKg&amp;outcomeid=6u70axv464x0xikni1&amp;otheroutcomes=6u70axv498x0x0,6u70axv464x0xikni2');" title="Add to My Selections" data-odd="1.11"></button></td>
+<td class="table-main__odds" data-oid="6u70axv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=6a2gozKg&amp;outcomeid=6u70axv498x0x0&amp;otheroutcomes=6u70axv464x0xikni1,6u70axv464x0xikni2');" title="Add to My Selections" data-odd="9.97"></button></td>
+<td class="table-main__odds" data-oid="6u70axv464x0xikni2"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=6a2gozKg&amp;outcomeid=6u70axv464x0xikni2&amp;otheroutcomes=6u70axv464x0xikni1,6u70axv498x0x0');" title="Add to My Selections" data-odd="17.79"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">27.01. 16:00</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/everton-luton/QecE592c/" class="in-match"><span>Everton</span> - <span>Luton</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6up13xv464x0ximbc5"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=QecE592c&amp;outcomeid=6up13xv464x0ximbc5&amp;otheroutcomes=6up13xv498x0x0,6up13xv464x0ximbc6');" title="Add to My Selections" data-odd="1.52"></button></td>
+<td class="table-main__odds" data-oid="6up13xv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=QecE592c&amp;outcomeid=6up13xv498x0x0&amp;otheroutcomes=6up13xv464x0ximbc5,6up13xv464x0ximbc6');" title="Add to My Selections" data-odd="4.20"></button></td>
+<td class="table-main__odds" data-oid="6up13xv464x0ximbc6"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=QecE592c&amp;outcomeid=6up13xv464x0ximbc6&amp;otheroutcomes=6up13xv464x0ximbc5,6up13xv498x0x0');" title="Add to My Selections" data-odd="6.06"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">&nbsp;</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/leeds-plymouth/IZ5cpfZa/" class="in-match"><span>Leeds</span> - <span>Plymouth</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70bxv464x0xikni3"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=IZ5cpfZa&amp;outcomeid=6u70bxv464x0xikni3&amp;otheroutcomes=6u70bxv498x0x0,6u70bxv464x0xikni4');" title="Add to My Selections" data-odd="1.30"></button></td>
+<td class="table-main__odds" data-oid="6u70bxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=IZ5cpfZa&amp;outcomeid=6u70bxv498x0x0&amp;otheroutcomes=6u70bxv464x0xikni3,6u70bxv464x0xikni4');" title="Add to My Selections" data-odd="5.71"></button></td>
+<td class="table-main__odds" data-oid="6u70bxv464x0xikni4"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=IZ5cpfZa&amp;outcomeid=6u70bxv464x0xikni4&amp;otheroutcomes=6u70bxv464x0xikni3,6u70bxv498x0x0');" title="Add to My Selections" data-odd="8.33"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">&nbsp;</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/leicester-birmingham/6ubElfYs/" class="in-match"><span>Leicester</span> - <span>Birmingham</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">14</td>
+<td class="table-main__odds" data-oid="6un80xv464x0xim6r1"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=6ubElfYs&amp;outcomeid=6un80xv464x0xim6r1&amp;otheroutcomes=6un80xv498x0x0,6un80xv464x0xim6r2');" title="Add to My Selections" data-odd="1.33"></button></td>
+<td class="table-main__odds" data-oid="6un80xv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=6ubElfYs&amp;outcomeid=6un80xv498x0x0&amp;otheroutcomes=6un80xv464x0xim6r1,6un80xv464x0xim6r2');" title="Add to My Selections" data-odd="5.44"></button></td>
+<td class="table-main__odds" data-oid="6un80xv464x0xim6r2"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=6ubElfYs&amp;outcomeid=6un80xv464x0xim6r2&amp;otheroutcomes=6un80xv464x0xim6r1,6un80xv498x0x0');" title="Add to My Selections" data-odd="8.00"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">&nbsp;</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/sheffield-utd-brighton/QuTO0FJt/" class="in-match"><span>Sheffield Utd</span> - <span>Brighton</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70hxv464x0xiknif"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=QuTO0FJt&amp;outcomeid=6u70hxv464x0xiknif&amp;otheroutcomes=6u70hxv498x0x0,6u70hxv464x0xiknig');" title="Add to My Selections" data-odd="5.21"></button></td>
+<td class="table-main__odds" data-oid="6u70hxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=QuTO0FJt&amp;outcomeid=6u70hxv498x0x0&amp;otheroutcomes=6u70hxv464x0xiknif,6u70hxv464x0xiknig');" title="Add to My Selections" data-odd="4.21"></button></td>
+<td class="table-main__odds" data-oid="6u70hxv464x0xiknig"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=QuTO0FJt&amp;outcomeid=6u70hxv464x0xiknig&amp;otheroutcomes=6u70hxv464x0xiknif,6u70hxv498x0x0');" title="Add to My Selections" data-odd="1.58"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">27.01. 20:00</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/fulham-newcastle-utd/lKyc5eBP/" class="in-match"><span>Fulham</span> - <span>Newcastle</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70gxv464x0xiknid"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=lKyc5eBP&amp;outcomeid=6u70gxv464x0xiknid&amp;otheroutcomes=6u70gxv498x0x0,6u70gxv464x0xiknie');" title="Add to My Selections" data-odd="2.89"></button></td>
+<td class="table-main__odds" data-oid="6u70gxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=lKyc5eBP&amp;outcomeid=6u70gxv498x0x0&amp;otheroutcomes=6u70gxv464x0xiknid,6u70gxv464x0xiknie');" title="Add to My Selections" data-odd="3.54"></button></td>
+<td class="table-main__odds" data-oid="6u70gxv464x0xiknie"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=lKyc5eBP&amp;outcomeid=6u70gxv464x0xiknie&amp;otheroutcomes=6u70gxv464x0xiknid,6u70gxv498x0x0');" title="Add to My Selections" data-odd="2.31"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">28.01. 12:45</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/west-brom-wolves/0G4fwRU4/" class="in-match"><span>West Brom</span> - <span>Wolves</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6un98xv464x0xim6th"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=0G4fwRU4&amp;outcomeid=6un98xv464x0xim6th&amp;otheroutcomes=6un98xv498x0x0,6un98xv464x0xim6ti');" title="Add to My Selections" data-odd="3.73"></button></td>
+<td class="table-main__odds" data-oid="6un98xv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=0G4fwRU4&amp;outcomeid=6un98xv498x0x0&amp;otheroutcomes=6un98xv464x0xim6th,6un98xv464x0xim6ti');" title="Add to My Selections" data-odd="3.59"></button></td>
+<td class="table-main__odds" data-oid="6un98xv464x0xim6ti"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=0G4fwRU4&amp;outcomeid=6un98xv464x0xim6ti&amp;otheroutcomes=6un98xv464x0xim6th,6un98xv498x0x0');" title="Add to My Selections" data-odd="1.93"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">28.01. 15:00</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/watford-southampton/Cx3knG4m/" class="in-match"><span>Watford</span> - <span>Southampton</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u709xv464x0xiknhv"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=Cx3knG4m&amp;outcomeid=6u709xv464x0xiknhv&amp;otheroutcomes=6u709xv498x0x0,6u709xv464x0xikni0');" title="Add to My Selections" data-odd="3.40"></button></td>
+<td class="table-main__odds" data-oid="6u709xv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=Cx3knG4m&amp;outcomeid=6u709xv498x0x0&amp;otheroutcomes=6u709xv464x0xiknhv,6u709xv464x0xikni0');" title="Add to My Selections" data-odd="3.68"></button></td>
+<td class="table-main__odds" data-oid="6u709xv464x0xikni0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=Cx3knG4m&amp;outcomeid=6u709xv464x0xikni0&amp;otheroutcomes=6u709xv464x0xiknhv,6u709xv498x0x0');" title="Add to My Selections" data-odd="2.00"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">28.01. 15:30</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/liverpool-norwich/nBoN3mX9/" class="in-match"><span>Liverpool</span> - <span>Norwich</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6up15xv464x0ximbcg"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=nBoN3mX9&amp;outcomeid=6up15xv464x0ximbcg&amp;otheroutcomes=6up15xv498x0x0,6up15xv464x0ximbch');" title="Add to My Selections" data-odd="1.07"></button></td>
+<td class="table-main__odds" data-oid="6up15xv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=nBoN3mX9&amp;outcomeid=6up15xv498x0x0&amp;otheroutcomes=6up15xv464x0ximbcg,6up15xv464x0ximbch');" title="Add to My Selections" data-odd="11.14"></button></td>
+<td class="table-main__odds" data-oid="6up15xv464x0ximbch"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=nBoN3mX9&amp;outcomeid=6up15xv464x0ximbch&amp;otheroutcomes=6up15xv464x0ximbcg,6up15xv498x0x0');" title="Add to My Selections" data-odd="23.85"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">28.01. 17:30</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/newport-manchester-united/jVvp6M3F/" class="in-match"><span>Newport</span> - <span>Manchester Utd</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6un7vxv464x0xim6qv"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=jVvp6M3F&amp;outcomeid=6un7vxv464x0xim6qv&amp;otheroutcomes=6un7vxv498x0x0,6un7vxv464x0xim6r0');" title="Add to My Selections" data-odd="27.24"></button></td>
+<td class="table-main__odds" data-oid="6un7vxv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=jVvp6M3F&amp;outcomeid=6un7vxv498x0x0&amp;otheroutcomes=6un7vxv464x0xim6qv,6un7vxv464x0xim6r0');" title="Add to My Selections" data-odd="12.27"></button></td>
+<td class="table-main__odds" data-oid="6un7vxv464x0xim6r0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=jVvp6M3F&amp;outcomeid=6un7vxv464x0xim6r0&amp;otheroutcomes=6un7vxv464x0xim6qv,6un7vxv498x0x0');" title="Add to My Selections" data-odd="1.06"></button></td>
+</tr>
+<tr>
+<td class="table-main__datetime">29.01. 20:30</td>
+<td class="h-text-left"><a href="/football/england/fa-cup/blackburn-wrexham/8ObAshJI/" class="in-match"><span>Blackburn</span> - <span>Wrexham</span></a></td>
+<td class="h-text-center">
+<ul class="list-tags"><li class="list-tags__item"><i class="icon icon__stream"></i><div class="list-tags__window list-tags__window--streams"><ul class="list-tags__window__in">
+<li>Live streams</li>
+<li><a href="/bookmaker/1039/http://refparrknf.top/L?tag=s_144205m_355c_&amp;site=144205&amp;ad=355" target="_blank">1xBet</a></li>
+</ul></div></li></ul>
+</td>
+<td class="table-main__bs">15</td>
+<td class="table-main__odds" data-oid="6u70exv464x0xiknib"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=8ObAshJI&amp;outcomeid=6u70exv464x0xiknib&amp;otheroutcomes=6u70exv498x0x0,6u70exv464x0xiknic');" title="Add to My Selections" data-odd="1.58"></button></td>
+<td class="table-main__odds" data-oid="6u70exv498x0x0"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=8ObAshJI&amp;outcomeid=6u70exv498x0x0&amp;otheroutcomes=6u70exv464x0xiknib,6u70exv464x0xiknic');" title="Add to My Selections" data-odd="4.35"></button></td>
+<td class="table-main__odds" data-oid="6u70exv464x0xiknic"><button onclick="my_selections_click('1x2', 'football', 'action=3&amp;matchid=8ObAshJI&amp;outcomeid=6u70exv464x0xiknic&amp;otheroutcomes=6u70exv464x0xiknib,6u70exv498x0x0');" title="Add to My Selections" data-odd="4.94"></button></td>
+</tr>
+</tbody></table>
+</div></div>
+</div><table style="margin-top: 24px; width: 100%;"><tbody><tr><td style="vertical-align: middle;"><a href="/redirects/?url=http://www.oddsportal.com/"><img src="/res/images/portal_op_logo.gif" alt="OddsPortal.com" width="120" height="25"></a></td><td style="vertical-align: middle;">Betting odds service&nbsp;provided in cooperation with <a href="/redirects/?url=http://www.oddsportal.com/">OddsPortal.com</a></td></tr></tbody></table><div class="js-tablebanner-div h-display-none">
+<div class="js-banner js-tablebanner-b1" id="rs1_tablet"><div class="adsenvelope adstextpad banx-rs1_tablet" id="lsadvert-zid-2713" style="width:728px;"><div style="height:90px"><div class="adscontent" id="lsadvert-rs1_tablet"><iframe id="lsadvert-zid-2713-iframe" name="banx-rs1_tablet" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:728px; height:90px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+<div class="js-banner js-tablebanner-b1" id="rs1_mobile"><div class="adsenvelope adstextpad banx-rs1_mobile" id="lsadvert-zid-2715" style="width:320px;"><div style="height:50px"><div class="adscontent" id="lsadvert-rs1_mobile"><iframe id="lsadvert-zid-2715-iframe" name="banx-rs1_mobile" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:320px; height:50px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+<div class="js-banner js-tablebanner-b2" id="rs2_tablet"><div class="adsenvelope adstextpad banx-rs2_tablet" id="lsadvert-zid-2714" style="width:728px;"><div style="height:90px"><div class="adscontent" id="lsadvert-rs2_tablet"><iframe id="lsadvert-zid-2714-iframe" name="banx-rs2_tablet" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:728px; height:90px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+<div class="js-banner js-tablebanner-b2" id="rs2_mobile"><div class="adsenvelope adstextpad banx-rs2_mobile" id="lsadvert-zid-2716" style="width:300px;"><div style="height:250px"><div class="adscontent" id="lsadvert-rs2_mobile"><iframe id="lsadvert-zid-2716-iframe" name="banx-rs2_mobile" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:300px; height:250px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+</div>
+</section>
+<div class="js-banner" id="under_desktop"><div class="adsenvelope adstextpad banx-under_desktop" id="lsadvert-zid-2717" style="width:300px;"><div style="height:250px"><div class="adscontent" id="lsadvert-under_desktop"><iframe id="lsadvert-zid-2717-iframe" name="banx-under_desktop" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:300px; height:250px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+<div class="js-banner" id="under_tablet"><div class="adsenvelope adstextpad banx-under_tablet" id="lsadvert-zid-2718" style="width:300px;"><div style="height:250px"><div class="adscontent" id="lsadvert-under_tablet"><iframe id="lsadvert-zid-2718-iframe" name="banx-under_tablet" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:300px; height:250px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+<div class="js-banner" id="under_mobile"><div class="adsenvelope adstextpad banx-under_mobile" id="lsadvert-zid-2719" style="width:320px;"><div style="height:250px"><div class="adscontent" id="lsadvert-under_mobile"><iframe id="lsadvert-zid-2719-iframe" name="banx-under_mobile" frameborder="0" scrolling="no" style="allowTransparency: true; visibility: hidden; width:320px; height:250px"></iframe></div><div class="adsgraphhori"><div class="adsghori ath-en"></div></div></div></div></div>
+						</div>
