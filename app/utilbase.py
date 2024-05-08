@@ -116,6 +116,10 @@ class LoadSave():
         with self._lock:
             retries: int = 0
             delay: float = 60.0
+            if url == 'javascript:void(0);':
+                print(datetime.datetime.now(), flush=True)
+                print(url, flush=True)
+                return None
             while retries < 4:
                 try:
                     r: aiohttp.ClientResponse
@@ -134,12 +138,14 @@ class LoadSave():
                         return HTMLData(await r.read(), creation_date)
                 except (ClientConnectorError, ConnectionRefusedError, asyncio.TimeoutError) as ex:
                     print(datetime.datetime.now(), flush=True)
+                    print(url, flush=True)
                     print(ex, flush=True)
                     await asyncio.sleep(delay)
                     delay *= 2
                     retries += 1
                 except Exception as ex:
                     print(datetime.datetime.now(), flush=True)
+                    print(url, flush=True)
                     print(ex, flush=True)
                     print('Неизвестная ошибка', flush=True)
                     await asyncio.sleep(delay)
