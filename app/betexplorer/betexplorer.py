@@ -141,7 +141,7 @@ def parsing_countries(soup: Optional[ReceivedData]) -> list[CountryBetexplorer]:
             'country_url': item.css_first('a[href]').attrs['href'],
             'country_name': item.text(strip=True),
             'country_order': index,
-            'country_flag_url': item.css_first('img[src]').attrs['src'],
+            'country_flag_url': flg.attrs['src'] if (flg := item.css_first('img[src]').attrs['src']) is not None else None,
         } for index, item in enumerate(soup.node.css(CSS_COUNTRIES_ITEMS))
     ] if soup is not None else []
 
