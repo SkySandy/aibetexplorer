@@ -8,7 +8,7 @@ from multiprocessing import Manager
 from multiprocessing.synchronize import Lock as MultiLock
 import re
 import signal
-from typing import TYPE_CHECKING, Any, Callable, Final, List, Optional
+from typing import TYPE_CHECKING, Any, Callable, Final, Optional
 from urllib.parse import urljoin, urlparse
 
 from selectolax.parser import Node
@@ -119,14 +119,18 @@ CSS_MATCH: Final[str] = '.wrap-page__in'
 CSS_SHOOTERS: Final[str] = 'ul.list-details.list-details--shooters'
 CSS_PAGE_TEAM: Final[str] = 'header.wrap-section__header'
 CSS_PAGE_TEAM_BEG: Final[str] = 'h1.wrap-section__header__title'
+CSS_PAGE_STANDING: Final[str] = 'section.wrap-section'
 
 CSS_COUNTRIES_ITEMS: Final[str] = 'div.list-events__item__in'
 CSS_CHAMPIONSHIPS_ITEMS: Final[str] = 'tbody'
 CSS_STAGES_ITEMS: Final[str] = 'ul.list-tabs.list-tabs--secondary'
+CSS_STAGES_SHORT_ITEMS: Final[str] = 'ul.list-tabs.list-tabs--secondary.list-tabs--short'
 CSS_SCORE_HALVES_ITEMS: Final[str] = 'h2.list-details__item__partial'
 
+JAVASCRIPT_VOID = 'javascript:void(0);'
 
-def parsing_countries(soup: Optional[ReceivedData]) -> List[CountryBetexplorer]:
+
+def parsing_countries(soup: Optional[ReceivedData]) -> list[CountryBetexplorer]:
     """Разбор страницы списка всех стран.
 
     :param soup: Данные для разбора
@@ -140,6 +144,20 @@ def parsing_countries(soup: Optional[ReceivedData]) -> List[CountryBetexplorer]:
             'country_flag_url': item.css_first('img[src]').attrs['src'],
         } for index, item in enumerate(soup.node.css(CSS_COUNTRIES_ITEMS))
     ] if soup is not None else []
+
+
+async def get_countries(ls: LoadSave, url: str, need_refresh: bool = False) -> Optional[
+    list[CountryBetexplorer]]:  # noqa: FBT001, FBT002
+    """Загрузка страницы стран.
+
+    :param ls: Класс для работы с файлами
+    :param url: Адрес страницы для разборы
+    :param need_refresh: Необходимо обновить данные
+    """
+    load_countries: Optional[ReceivedData]
+    if (load_countries := await ls.get_read(url, CSS_COUNTRIES, need_refresh)) is not None:
+        return parsing_countries(load_countries)
+    return None
 
 
 def parsing_championships(
@@ -179,19 +197,59 @@ def parsing_odds(item: Node) -> Optional[float]:
         '[data-odd]')) is not None else None
 
 
-def parsing_stages(soup: ReceivedData) -> List[ChampionshipStageBetexplorer]:
+def parsing_stages(soup: ReceivedData) -> list[ChampionshipStageBetexplorer]:
     """Разбор стадий чемпионата.
 
     :param soup: Страница для разбора
     """
-    return [
-        {'stage_id': None,
-         'stage_url': item.attrs['href'],
-         'stage_name': item.text(deep=False, strip=True),
-         'stage_order': index,
-         'stage_current': 'current' in item.attrs.get('class', ''),
-         } for index, item in enumerate(stages_beg.css('a[href]'))
-    ] if (stages_beg := soup.node.css_first(CSS_STAGES_ITEMS)) is not None else []
+    if soup is None:
+        return []
+    ret_main: list[ChampionshipStageBetexplorer] = []
+    if (block := soup.node.css_first('div.h-mb15')) is not None:
+        stage_group: dict[int, str] = {
+            index: item.text(deep=False, strip=True) + '. '
+            for stages_beg in block.css(CSS_STAGES_ITEMS)
+            for index, item in enumerate(stages_beg.css('a[href]')) if item.attrs['href'] == JAVASCRIPT_VOID
+        }
+        ret_main = [
+                {'stage_id': None,
+                 'stage_url': item.attrs['href'],
+                 'stage_name': stage_group.get(i - 1, '') + item.text(deep=False, strip=True),
+                 'stage_order': index,
+                 'stage_current': 'current' in item.attrs.get('class', ''),
+                 } for i, stages_beg in enumerate(block.css(CSS_STAGES_ITEMS))
+                for index, item in enumerate(stages_beg.css('a[href]')) if item.attrs['href'] != JAVASCRIPT_VOID
+            ]
+        if stage_group:
+            return ret_main
+
+    ret_short: list[ChampionshipStageBetexplorer] = []
+    if (block := soup.node.css_first(CSS_STAGES_SHORT_ITEMS)) is not None:
+        ret_short = [
+                {'stage_id': None,
+                 'stage_url': item.attrs['href'],
+                 'stage_name': item.text(deep=False, strip=True),
+                 'stage_order': index,
+                 'stage_current': 'current' in item.attrs.get('class', ''),
+                 } for index, item in enumerate(block.css('a[href]'))
+            ]
+        if ret_short[-1]['stage_name'] == 'All results' or ret_short[-1]['stage_name'] == 'All fixtures':
+            ret_short = [ret_short[-1]]
+
+    if not ret_short:
+        return ret_main
+
+    if not ret_main:
+        return ret_short
+
+    index = next((i for i, item in enumerate(ret_main) if item['stage_current']), None)
+    if index is not None:
+        old = ret_main.pop(index)
+        if len(ret_short) == 1:
+            ret_short[0]['stage_name'] = old['stage_name']
+
+    ret_main.extend(ret_short)
+    return ret_main
 
 
 def parsing_date_results(item: Node, creation_date: datetime.datetime) -> Optional[datetime.datetime]:
@@ -357,14 +415,14 @@ def get_column_type_shooters(sport_id: SportType, tab_index: int, column_number:
     )
 
 
-def parsing_shooters(sport_id: SportType, table_data: Node, tab_index: int) -> List[ShooterBetexplorer]:
+def parsing_shooters(sport_id: SportType, table_data: Node, tab_index: int) -> list[ShooterBetexplorer]:
     """Разбор забивающих голы.
 
     :param sport_id: Вид спорта
     :param table_data: Данные для разбора
     :param tab_index: Номер колонки
     """
-    shooters: List[ShooterBetexplorer] = []
+    shooters: list[ShooterBetexplorer] = []
     for event_order, event_item in enumerate(table_data.iter(include_text=False)):
         shooter: ShooterBetexplorer = {
             'shooter_id': None,
@@ -403,20 +461,20 @@ def parsing_results(
         soup: Optional[ReceivedData],
         sport_id: SportType,
         championship_id: int,
-        is_fixture: int) -> Optional[ResultsBetexplorer]:
+        stage_name: Optional[str],
+        is_fixture: int) -> list[MatchBetexplorer]:
     """Разбор страницы результатов матчей чемпионата.
 
     :param soup: Данные для разбора
     :param sport_id: Вид спорта
     :param championship_id: Идентификатор чемпионата
+    :param stage_name: Имя стадии чемпионата
     :param is_fixture: Строка это результат (0) или расписание (1)
     """
     if soup is not None:
-        stages: List[ChampionshipStageBetexplorer] = parsing_stages(soup)
-        matches: List[MatchBetexplorer] = []
+        matches: list[MatchBetexplorer] = []
         if (table_result := soup.node.css_first(
                 CSS_RESULT if is_fixture == IS_RESULT else CSS_FIXTURE)) is not None:
-            stage_name: Optional[str] = next((item['stage_name'] for item in stages if item['stage_current']), None)
             round_name: Optional[str] = None
             round_number: Optional[int] = None
             saved_date: Optional[datetime.datetime] = None
@@ -453,11 +511,8 @@ def parsing_results(
                                     item, soup.creation_date, saved_date)
                                 saved_date = match['game_date']
                     matches.append(match)
-        return {
-            'stages': stages,
-            'matches': matches,
-        }
-    return None
+        return matches
+    return []
 
 
 def match_init(
@@ -541,17 +596,27 @@ async def get_results(ls: LoadSave,
     result_url: str = urljoin(urlparse(championship_url).path, 'results' if is_fixture == IS_RESULT else 'fixtures')
     load_results: Optional[ReceivedData]
     if (load_results := await ls.get_read(result_url, CSS_RESULTS, need_refresh)) is not None:
-        all_results: Optional[ResultsBetexplorer] = parsing_results(load_results, sport_id,
-                                                                    championship_id, is_fixture)
-        if all_results is not None:
-            for stage in all_results['stages']:
-                if not stage['stage_current'] and stage['stage_name'] != (  # noqa: SIM102
-                        'All results' if is_fixture == IS_RESULT else 'All fixtures'):
-                    if (load_results := await ls.get_read(
-                            urljoin(result_url, stage['stage_url']), CSS_RESULTS, need_refresh)) is not None:
-                        all_results['matches'].extend(
-                            (parsing_results(load_results, sport_id, championship_id, is_fixture))['matches'])
-            return all_results
+        stages: list[ChampionshipStageBetexplorer] = parsing_stages(load_results)
+        if stages:
+            main_stage: Optional[int] = next((i for i, item in enumerate(stages) if item['stage_name'] == 'Main'), None)
+            if main_stage is not None:
+                load_results = await ls.get_read(urljoin(result_url, stages[main_stage]['stage_url']), CSS_RESULTS, need_refresh)
+                if load_results is None:
+                    print(f'Закладка Main пустая {result_url} {stages[main_stage]["stage_url"]}', flush=True)
+                stages = parsing_stages(load_results)
+            matches = []
+            for stage in stages:
+                if (load_results := await ls.get_read(
+                        urljoin(result_url, stage['stage_url']), CSS_RESULTS, need_refresh)) is not None:
+                    matches.extend(parsing_results(load_results, sport_id, championship_id, stage['stage_name'], is_fixture))
+            return {
+                'stages': stages,
+                'matches': matches,
+            }
+        return {
+            'stages': [],
+            'matches': parsing_results(load_results, sport_id, championship_id, None, is_fixture),
+        }
     return None
 
 
@@ -575,7 +640,7 @@ async def get_results_fixtures(ls: LoadSave,
             and (
                     fixtures := await get_results(ls, championship_url, sport_id, championship_id, IS_FIXTURE,
                                                   need_refresh)) is not None):
-        matches: List[MatchBetexplorer] = results['matches'][:]
+        matches: list[MatchBetexplorer] = results['matches'][:]
         matches.extend(fixtures['matches'])
         # await self.get_standing(championship['championship_url'], need_refresh)
         if not matches:
@@ -589,14 +654,18 @@ async def get_results_fixtures(ls: LoadSave,
     return None
 
 
-def parsing_standings(soup: ReceivedData) -> Optional[str]:
-    """Разбор страницы чемпионата: найти ссылку на таблицу положения команд.
+async def parsing_standings_stage(
+        ls: LoadSave, soup: ReceivedData, need_refresh: bool = False) -> Optional[ReceivedData]:
+    """Получить одну страницу стадии турнирной таблицы.
 
+    :param ls: Класс для загрузки данных
     :param soup: Данные для разбора
+    :param need_refresh: Необходимо обновить данные
     """
-    link: Node
-    if (link := soup.node.css_first('a[href]')) is not None:
-        return link.attrs.get('href')
+    if ((st := soup.node.css_first('div.glib-stats-content')) is not None) and (
+            (link := st.css_first('a[href]')) is not None):
+        pars_table = link.attrs.get('href')
+        return await ls.get_read(pars_table, '', need_refresh)
     return None
 
 
@@ -609,10 +678,15 @@ async def get_standing(ls: LoadSave, championship_url: str, need_refresh: bool) 
     """
     stats_table: Optional[ReceivedData]
     if (stats_table := await ls.get_read(urlparse(championship_url).path,
-                                         '.glib-stats-content')) is not None:  # noqa: SIM102
-        if (pars_table := parsing_standings(stats_table)) is not None:
-            load_standing: Optional[ReceivedData] = await ls.get_read(pars_table, '.stats-table-container')
-            return load_standing
+                                         CSS_PAGE_STANDING), need_refresh) is not None:
+        stages: list[ChampionshipStageBetexplorer] = parsing_stages(stats_table)
+        if stages:
+            for stage in stages:
+                if (stats_table := await ls.get_read(urljoin(urlparse(championship_url).path, stage['stage_url']),
+                                                     CSS_PAGE_STANDING)) is not None:
+                    await parsing_standings_stage(ls, stats_table, need_refresh)
+        else:
+            await parsing_standings_stage(ls, stats_table, need_refresh)
     return None
 
 
@@ -837,13 +911,13 @@ async def get_championships(
                 if (results := await get_results_fixtures(
                         ls,
                         championship['championship_url'], sport_id,
-                        championship['championship_id'], need_refresh)) is not None:
+                        championship['championship_id'], True)) is not None:
                     match: MatchBetexplorer
                     for match in results['matches']:
                         if match['match_url'] is not None:
                             load_match: Optional[ReceivedData]
                             if (load_match := await ls.get_read(
-                                    match['match_url'], CSS_MATCH, need_refresh)) is not None:
+                                    match['match_url'], CSS_MATCH, False)) is not None:
                                 match_time: Optional[MatchBetexplorer] = parsing_match_time(
                                     load_match, sport_id, championship['championship_id'], match['stage_name'],
                                     match['round_name'], match['round_number'], match['is_fixture'])
@@ -851,9 +925,10 @@ async def get_championships(
                                 await get_team(
                                     ls, crd,
                                     session, [match['home_team'], match['away_team']], fast_country, fast_team)
-                    # async with session.begin():
-                    #     await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
-                    #     await crd.add_matches(session, championship['championship_id'], results['matches'])
+                    if save_database != DATABASE_NOT_USE:
+                        async with session.begin():
+                            await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
+                            await crd.add_matches(session, championship['championship_id'], results['matches'])
                 # break
     await db.close()
     await ls.close_session()
@@ -933,9 +1008,8 @@ async def load_data(
         await crd.sports_insert_all(session, SPORTS)
         sport_id: SportType
         for sport_id in sport_type:
-            load_countries: Optional[ReceivedData]
-            if (load_countries := await ls.get_read(sports_url[sport_id], CSS_COUNTRIES, True)) is not None:
-                countries: List[CountryBetexplorer] = parsing_countries(load_countries)
+            countries: list[CountryBetexplorer]
+            if (countries := await get_countries(ls, sports_url[sport_id])) is not None:
                 await crd.country_insert_all(session, sport_id, countries)
                 fast_country: dict[str, int] = {country['country_name']: country['country_id'] for country in countries}
                 country: CountryBetexplorer
