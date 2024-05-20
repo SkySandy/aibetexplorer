@@ -886,6 +886,31 @@ async def get_match_time(
     return None
 
 
+async def get_match_line(
+        ls: LoadSave,
+        sport_id: SportType,
+        championship: ChampionshipBetexplorer,
+        match: MatchBetexplorer,
+        need_refresh: bool,  # noqa: FBT001
+) -> None:
+    """Загрузка и разбор информации по линии.
+
+    :param ls: Класс для загрузки данных
+    :param sport_id: Вид спорта
+    :param championship: Информация о чемпионате
+    :param match: Информация о матче
+    :param need_refresh: Необходимо обновить данные
+    """
+    if match['match_url'] is not None:
+        await ls.get_read(urljoin('/match-odds-old/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/1/'), '')  # noqa: E501
+        await ls.get_read(urljoin('/match-odds-old/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ah/1/'), '')  # noqa: E501
+        await ls.get_read(urljoin('/match-odds-old/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/bts/1/'), '')  # noqa: E501
+    # await ls.get_read(
+    #     self, urljoin('/match-odds/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/'),
+    #     '',
+    #     need_refresh)
+
+
 async def get_championships(
         root_dir: str,
         database: Optional[str],
@@ -947,17 +972,13 @@ async def get_championships(
                             await get_team(
                                 ls, crd, session,
                                 [match['home_team'], match['away_team']], fast_country, fast_team)
+                            await get_match_line(ls, sport_id, championship, match, False)
                     if save_database != DATABASE_NOT_USE:
                         async with session.begin():
                             await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
                             await crd.add_matches(session, championship['championship_id'], results['matches'])
-                # break
     await db.close()
     await ls.close_session()
-    # await ls.get_read(
-    #     self, urljoin('/match-odds/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/'),
-    #     '',
-    #     need_refresh)
 
 
 def wrapper(async_func: Callable, *args: Any) -> None:
@@ -1047,8 +1068,6 @@ async def load_data(
                             root_dir, database, config_engine, load_net, save_database,
                             sport_id, country, updated_years, fast_country, lock)  # noqa: COM812
                         )
-                    # break
-            # break
     if futures:
         await asyncio.wait(futures)
     await crd.analyze_match(session)
