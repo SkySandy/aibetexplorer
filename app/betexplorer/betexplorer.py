@@ -141,7 +141,7 @@ def parsing_countries(soup: Optional[ReceivedData]) -> list[CountryBetexplorer]:
             'country_url': item.css_first('a[href]').attrs['href'],
             'country_name': item.text(strip=True),
             'country_order': index,
-            'country_flag_url': flg.attrs['src'] if (flg := item.css_first('img[src]').attrs['src']) is not None else None,
+            'country_flag_url': flg.attrs['src'] if (flg := item.css_first('img[src]')) is not None else None,
         } for index, item in enumerate(soup.node.css(CSS_COUNTRIES_ITEMS))
     ] if soup is not None else []
 
@@ -859,6 +859,33 @@ async def get_team(ls: LoadSave,
             })
 
 
+async def get_match_time(
+        ls: LoadSave,
+        sport_id: SportType,
+        championship: ChampionshipBetexplorer,
+        match: MatchBetexplorer,
+        need_refresh: bool,  # noqa: FBT001
+) -> Optional[MatchBetexplorer]:
+    """Загрузка и разбор информации по тайм-матч.
+
+    :param ls: Класс для загрузки данных
+    :param sport_id: Вид спорта
+    :param championship: Информация о чемпионате
+    :param match: Информация о матче
+    :param need_refresh: Необходимо обновить данные
+    """
+    if match['match_url'] is not None:
+        load_match: Optional[ReceivedData]
+        if (load_match := await ls.get_read(match['match_url'], CSS_MATCH, need_refresh)) is not None:
+            match_time: Optional[MatchBetexplorer] = parsing_match_time(
+                load_match, sport_id, championship['championship_id'], match['stage_name'],
+                match['round_name'], match['round_number'], match['is_fixture'])
+            if need_refresh and match_time['game_date'] + datetime.timedelta(days=1) > match_time['download_date']:
+                return await get_match_time(ls, sport_id, championship, match, True)  # noqa: FBT003
+            return match_time
+    return None
+
+
 async def get_championships(
         root_dir: str,
         database: Optional[str],
@@ -911,20 +938,15 @@ async def get_championships(
                 if (results := await get_results_fixtures(
                         ls,
                         championship['championship_url'], sport_id,
-                        championship['championship_id'], True)) is not None:
+                        championship['championship_id'], need_refresh)) is not None:
                     match: MatchBetexplorer
                     for match in results['matches']:
-                        if match['match_url'] is not None:
-                            load_match: Optional[ReceivedData]
-                            if (load_match := await ls.get_read(
-                                    match['match_url'], CSS_MATCH, False)) is not None:
-                                match_time: Optional[MatchBetexplorer] = parsing_match_time(
-                                    load_match, sport_id, championship['championship_id'], match['stage_name'],
-                                    match['round_name'], match['round_number'], match['is_fixture'])
-                                update_match_time(match, match_time)
-                                await get_team(
-                                    ls, crd,
-                                    session, [match['home_team'], match['away_team']], fast_country, fast_team)
+                        match_time: Optional[MatchBetexplorer]
+                        if (match_time := await get_match_time(ls, sport_id, championship, match, False)) is not None:
+                            update_match_time(match, match_time)
+                            await get_team(
+                                ls, crd, session,
+                                [match['home_team'], match['away_team']], fast_country, fast_team)
                     if save_database != DATABASE_NOT_USE:
                         async with session.begin():
                             await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
