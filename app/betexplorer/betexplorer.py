@@ -902,9 +902,12 @@ async def get_match_line(
     :param need_refresh: Необходимо обновить данные
     """
     if match['match_url'] is not None:
-        await ls.get_read(urljoin('/match-odds-old/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/1/'), '')  # noqa: E501
-        await ls.get_read(urljoin('/match-odds-old/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ah/1/'), '')  # noqa: E501
-        await ls.get_read(urljoin('/match-odds-old/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/bts/1/'), '')  # noqa: E501
+        match_bet: str = [x for x in urlparse(match['match_url']).path.split('/') if x][-1]
+
+        if sport_id in [SportType.FOOTBALL, SportType.HOCKEY]:
+            await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/bts/1/'), '')
+        await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ou/1/'), '')
+        await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ah/1/'), '')
     # await ls.get_read(
     #     self, urljoin('/match-odds/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/'),
     #     '',
