@@ -15,11 +15,37 @@ from app.betexplorer.betexplorer import (
     COLUMN_ODDS_X,
     COLUMN_SCORE,
     COLUMN_TEAMS,
+    CSS_COUNTRIES,
+    CSS_PAGE_TEAM,
+    CSS_RESULTS,
+    CSS_SHOOTERS,
     IS_FIXTURE,
     IS_RESULT,
-    Be,
+    get_column_type,
+    get_results,
+    get_results_fixtures,
+    get_team,
+    match_init,
+    parsing_championships,
+    parsing_countries,
+    parsing_date_fixtures,
+    parsing_date_match,
+    parsing_date_results,
+    parsing_match_time,
+    parsing_odds,
+    parsing_results,
+    parsing_round,
+    parsing_score,
+    parsing_score_halves,
+    parsing_score_stage,
+    parsing_shooters,
+    parsing_stages,
+    parsing_team,
+    parsing_team_data,
+    parsing_team_match,
+    update_match_time,
 )
-from app.betexplorer.crud import DATABASE_NOT_USE
+from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer
 from app.betexplorer.schemas import (
     ChampionshipBetexplorer,
     ChampionshipStageBetexplorer,
@@ -31,23 +57,17 @@ from app.betexplorer.schemas import (
     TeamBetexplorer,
 )
 from app.config import settings
-from app.utilbase import ReceivedData
+from app.utilbase import LoadSave, ReceivedData
 
 _PARSERS_PARAMETRIZER = ('parser', (HTMLParser, LexborHTMLParser))
-
-
-@pytest_asyncio.fixture
-async def be_instance() -> Be:
-    """Создание класса BE для тестов."""
-    return Be(root_dir='path/to/root_dir', database='path/to/database')
 
 
 class TestParsingCountries:
     """Тест разбора страницы стран."""
 
-    def test_returns_empty_list_when_input_is_none(self, be_instance: Be):
+    def test_returns_empty_list_when_input_is_none(self):
         """Возвращает пустой список, если передано None."""
-        result = be_instance.parsing_countries(None)
+        result = parsing_countries(None)
         assert result == []
 
     @pytest.mark.asyncio()
@@ -79,20 +99,20 @@ class TestParsingCountries:
                 </ul>
             </div>
         """
-        node = parser(html).css_first(Be.CSS_COUNTRIES)
+        node = parser(html).css_first(CSS_COUNTRIES)
         soap: ReceivedData = ReceivedData(node, datetime.datetime(2020, 1, 1, 10, 30))
-        res = Be.parsing_countries(soap)
+        res = parsing_countries(soap)
         assert not DeepDiff(pars, res)
 
 
 class TestParsingChampionships:
     """Тест разбора страницы чемпионатов по стране."""
 
-    def test_empty_input(self, be_instance: Be):
+    def test_empty_input(self):
         """Возвращает пустой список, если передано None."""
         country_id = 0
         sport_id = SportType.FOOTBALL.value
-        result = be_instance.parsing_championships(None, sport_id, country_id)
+        result = parsing_championships(None, sport_id, country_id)
         assert result == []
 
     @pytest.mark.asyncio()
@@ -144,7 +164,7 @@ class TestParsingChampionships:
         """
         node = parser(html).css_first('.table-main.js-tablebanner-t,.nodata')
         soap: ReceivedData = ReceivedData(node, datetime.datetime(2020, 1, 1, 10, 30))
-        res = Be.parsing_championships(soap, sport_id, country_id)
+        res = parsing_championships(soap, sport_id, country_id)
         assert not DeepDiff(pars, res)
 
 
@@ -188,9 +208,9 @@ class TestParsingStages:
                 </div>
             </div>
         """
-        node = parser(html).css_first(Be.CSS_RESULTS)
+        node = parser(html).css_first(CSS_RESULTS)
         soap: ReceivedData = ReceivedData(node, datetime.datetime(2020, 1, 1, 10, 30))
-        res = Be.parsing_stages(soap)
+        res = parsing_stages(soap)
         assert not DeepDiff(pars, res)
 
 
@@ -276,7 +296,7 @@ class TestParsingTeamData:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                team_url, team_name, team_emblem, team_full = Be.parsing_team_data(item)
+                team_url, team_name, team_emblem, team_full = parsing_team_data(item)
                 if index == 0:
                     assert team_url == '/football/team/nottingham/UsushcZr/'
                     assert team_name == 'Nottingham'
@@ -319,7 +339,7 @@ class TestParsingRound:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                round_name, round_number = Be.parsing_round(item)
+                round_name, round_number = parsing_round(item)
                 if index == 0:
                     assert round_name == '25. Round'
                     assert round_number == 25
@@ -346,7 +366,7 @@ class TestParsingTeamMatch:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                match_url, home_team_name, away_team_name = Be.parsing_team_match(item)
+                match_url, home_team_name, away_team_name = parsing_team_match(item)
                 if index == 0:
                     assert match_url == '/football/england/fa-cup/aston-villa-chelsea/bTRJf3RS/'
                     assert home_team_name == 'Aston Villa'
@@ -369,7 +389,7 @@ async def test_parsing_score(parser):
     node = parser(html).css_first('table tbody')
     for season_table in node.iter(False):
         for index, item in enumerate(season_table.iter(False)):
-            home_score, away_score = Be.parsing_score(item)
+            home_score, away_score = parsing_score(item)
             if index == 0:
                 assert home_score == 1
                 assert away_score == 4
@@ -397,7 +417,7 @@ class TestParsingScoreStage:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                home_score, away_score, score_stage_short, score_stage = Be.parsing_score_stage(item)
+                home_score, away_score, score_stage_short, score_stage = parsing_score_stage(item)
                 if index == 0:
                     assert home_score == 1
                     assert away_score == 4
@@ -422,6 +442,7 @@ class TestParsingOdds:
                     <tr>
                         <td class="table-main__odds" data-oid="6b3pjxv498x0x0" data-odd="4.07"></td>
                         <td class="table-main__odds colored" data-oid="6e0hoxv464x0xh8p85"><span><span><span data-odd="1.65"></span></span></span></td>
+                        <td class="table-main__detail-odds" data-odd=""></td>
                     </tr>
                 </tbody>
             </table>
@@ -429,11 +450,21 @@ class TestParsingOdds:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                res = Be.parsing_odds(item)
+                res = parsing_odds(item)
                 if index == 0:
                     assert res == 4.07
                 if index == 1:
                     assert res == 1.65
+                if index == 2:
+                    assert res is None
+
+    @pytest.mark.parametrize(*_PARSERS_PARAMETRIZER)
+    def test_empty_attributes(self, parser):
+        html = "<div><p id=''>text</p></div>"
+        selector = "p"
+        for node in parser(html).css(selector):
+            assert 'id' in node.attributes
+            assert node.attributes['id'] == ''
 
 
 class TestParsingDateResults:
@@ -458,7 +489,7 @@ class TestParsingDateResults:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                res = Be.parsing_date_results(item, datetime.datetime(2024, 2, 18))
+                res = parsing_date_results(item, datetime.datetime(2024, 2, 18))
                 if index == 0:
                     assert res == datetime.datetime(year=2024, month=2, day=17)
                 elif index == 1:
@@ -502,9 +533,9 @@ class TestParsingTeam:
                 </tbody>
             </table>
         """
-        node = parser(html).css_first(Be.CSS_PAGE_TEAM)
+        node = parser(html).css_first(CSS_PAGE_TEAM)
         soap: ReceivedData = ReceivedData(node, datetime.datetime(2020, 1, 1, 10, 30))
-        res = Be.parsing_team(soap, sport_id)
+        res = parsing_team(soap, sport_id)
         assert not DeepDiff(res, team, exclude_paths=["root['download_date']", "root['save_date']"])
 
 
@@ -530,9 +561,9 @@ class TestParsingDateFixtures:
         node = parser(html).css_first('table tbody')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                res = Be.parsing_date_fixtures(item,
-                                               datetime.datetime(2024, 2, 18, 16, 10),
-                                               datetime.datetime(2024, 2, 20, 19, 20))
+                res = parsing_date_fixtures(item,
+                                            datetime.datetime(2024, 2, 18, 16, 10),
+                                            datetime.datetime(2024, 2, 20, 19, 20))
                 if index == 0:
                     assert res == datetime.datetime(year=2024, month=3, day=13, hour=20, minute=30)
                 elif index == 1:
@@ -562,7 +593,7 @@ class TestParsingDateMatch:
         node = parser(html).css_first('ul.list-details')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                res = Be.parsing_date_match(item)
+                res = parsing_date_match(item)
                 if index == 0:
                     assert res == datetime.datetime(year=2024, month=2, day=26, hour=20, minute=45)
 
@@ -614,7 +645,7 @@ class TestParsingScoreHalves:
         node = parser(html).css_first('ul.list-details')
         for season_table in node.iter(False):
             for index, item in enumerate(season_table.iter(False)):
-                res = Be.parsing_score_halves(item)
+                res = parsing_score_halves(item)
                 if index == 0:
                     assert not DeepDiff(pars, res)
 
@@ -738,19 +769,19 @@ class TestParsingShooters:
                 </li>
             </ul>
         """
-        node = parser(html).css_first(Be.CSS_SHOOTERS)
+        node = parser(html).css_first(CSS_SHOOTERS)
         for tab_index, tab_item in enumerate(node.iter(False)):
             table_data = tab_item.css_first('table tbody')
-            res: List[ShooterBetexplorer] = Be.parsing_shooters(SportType.FOOTBALL, table_data, tab_index)
+            res: List[ShooterBetexplorer] = parsing_shooters(SportType.FOOTBALL, table_data, tab_index)
             if tab_index == 0:
                 assert not DeepDiff(pars, res)
             if tab_index == 1:
                 assert not DeepDiff(pars2, res)
 
-        node = parser(html_2).css_first(Be.CSS_SHOOTERS)
+        node = parser(html_2).css_first(CSS_SHOOTERS)
         for tab_index, tab_item in enumerate(node.iter(False)):
             table_data = tab_item.css_first('table tbody')
-            res: List[ShooterBetexplorer] = Be.parsing_shooters(SportType.FOOTBALL, table_data, tab_index)
+            res: List[ShooterBetexplorer] = parsing_shooters(SportType.FOOTBALL, table_data, tab_index)
             if tab_index == 0:
                 assert not DeepDiff(pars_21, res)
             if tab_index == 1:
@@ -937,7 +968,7 @@ async def test_parsing_match_time(parser):
     """
     node = parser(html).css_first('div')
     soap: ReceivedData = ReceivedData(node, datetime.datetime(2020, 1, 1, 10, 30))
-    match: Optional[MatchBetexplorer] = Be.parsing_match_time(soap, SportType.FOOTBALL, championship_id, 'stage_name', 'round_name', 10, IS_FIXTURE)
+    match: Optional[MatchBetexplorer] = parsing_match_time(soap, SportType.FOOTBALL, championship_id, 'stage_name', 'round_name', 10, IS_FIXTURE)
     assert not DeepDiff(pars, match, exclude_paths=["root['save_date']", "root['download_date']", "root['home_team']['download_date']", "root['home_team']['save_date']", "root['away_team']['download_date']", "root['away_team']['save_date']"])
 
 
@@ -1137,7 +1168,7 @@ class TestUpdateMatchTime:
             'is_fixture': 1,
         }
 
-        Be.update_match_time(pars, pars_2)
+        update_match_time(pars, pars_2)
         assert not DeepDiff(pars, pars_2)
 
 
@@ -1147,67 +1178,67 @@ class TestGetColumnType:
     @pytest.mark.asyncio()
     async def test_get_column_type(self):
         for sport_id in [SportType.FOOTBALL, SportType.HOCKEY, SportType.HANDBALL]:
-            res = Be.get_column_type(sport_id, IS_RESULT, 0)
+            res = get_column_type(sport_id, IS_RESULT, 0)
             assert res == COLUMN_TEAMS
-            res = Be.get_column_type(sport_id, IS_RESULT, 1)
+            res = get_column_type(sport_id, IS_RESULT, 1)
             assert res == COLUMN_SCORE
-            res = Be.get_column_type(sport_id, IS_RESULT, 2)
+            res = get_column_type(sport_id, IS_RESULT, 2)
             assert res == COLUMN_ODDS_1
-            res = Be.get_column_type(sport_id, IS_RESULT, 3)
+            res = get_column_type(sport_id, IS_RESULT, 3)
             assert res == COLUMN_ODDS_X
-            res = Be.get_column_type(sport_id, IS_RESULT, 4)
+            res = get_column_type(sport_id, IS_RESULT, 4)
             assert res == COLUMN_ODDS_2
-            res = Be.get_column_type(sport_id, IS_RESULT, 5)
+            res = get_column_type(sport_id, IS_RESULT, 5)
             assert res == COLUMN_GAME_DATE
-            res = Be.get_column_type(sport_id, IS_RESULT, 6)
+            res = get_column_type(sport_id, IS_RESULT, 6)
             assert res is None
 
         for sport_id in [SportType.BASEBALL, SportType.TENNIS, SportType.BASKETBALL, SportType.VOLLEYBALL]:
-            res = Be.get_column_type(sport_id, IS_RESULT, 0)
+            res = get_column_type(sport_id, IS_RESULT, 0)
             assert res == COLUMN_TEAMS
-            res = Be.get_column_type(sport_id, IS_RESULT, 1)
+            res = get_column_type(sport_id, IS_RESULT, 1)
             assert res == COLUMN_SCORE
-            res = Be.get_column_type(sport_id, IS_RESULT, 2)
+            res = get_column_type(sport_id, IS_RESULT, 2)
             assert res == COLUMN_ODDS_1
-            res = Be.get_column_type(sport_id, IS_RESULT, 3)
+            res = get_column_type(sport_id, IS_RESULT, 3)
             assert res == COLUMN_ODDS_2
-            res = Be.get_column_type(sport_id, IS_RESULT, 4)
+            res = get_column_type(sport_id, IS_RESULT, 4)
             assert res == COLUMN_GAME_DATE
-            res = Be.get_column_type(sport_id, IS_RESULT, 5)
+            res = get_column_type(sport_id, IS_RESULT, 5)
             assert res is None
 
         for sport_id in [SportType.FOOTBALL, SportType.HOCKEY, SportType.HANDBALL]:
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 0)
+            res = get_column_type(sport_id, IS_FIXTURE, 0)
             assert res == COLUMN_GAME_DATE
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 1)
+            res = get_column_type(sport_id, IS_FIXTURE, 1)
             assert res == COLUMN_TEAMS
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 4)
+            res = get_column_type(sport_id, IS_FIXTURE, 4)
             assert res == COLUMN_ODDS_1
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 5)
+            res = get_column_type(sport_id, IS_FIXTURE, 5)
             assert res == COLUMN_ODDS_X
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 6)
+            res = get_column_type(sport_id, IS_FIXTURE, 6)
             assert res == COLUMN_ODDS_2
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 2)
+            res = get_column_type(sport_id, IS_FIXTURE, 2)
             assert res is None
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 3)
+            res = get_column_type(sport_id, IS_FIXTURE, 3)
             assert res is None
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 7)
+            res = get_column_type(sport_id, IS_FIXTURE, 7)
             assert res is None
 
         for sport_id in [SportType.BASEBALL, SportType.TENNIS, SportType.BASKETBALL, SportType.VOLLEYBALL]:
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 0)
+            res = get_column_type(sport_id, IS_FIXTURE, 0)
             assert res == COLUMN_GAME_DATE
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 1)
+            res = get_column_type(sport_id, IS_FIXTURE, 1)
             assert res == COLUMN_TEAMS
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 4)
+            res = get_column_type(sport_id, IS_FIXTURE, 4)
             assert res == COLUMN_ODDS_1
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 5)
+            res = get_column_type(sport_id, IS_FIXTURE, 5)
             assert res == COLUMN_ODDS_2
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 2)
+            res = get_column_type(sport_id, IS_FIXTURE, 2)
             assert res is None
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 3)
+            res = get_column_type(sport_id, IS_FIXTURE, 3)
             assert res is None
-            res = Be.get_column_type(sport_id, IS_FIXTURE, 6)
+            res = get_column_type(sport_id, IS_FIXTURE, 6)
             assert res is None
 
 class TestMatchInit:
@@ -1263,7 +1294,7 @@ class TestMatchInit:
             'download_date': datetime.datetime(2023, 10, 17),
             'save_date': datetime.datetime.now(),
         }
-        res = Be.match_init(
+        res = match_init(
             sport_id=sport_id,
             championship_id=championship_id,
             stage_name=stage_name,
@@ -1419,9 +1450,9 @@ class TestParsingResults:
                 </table></div></div>
             </div>
         """
-        node = parser(html).css_first(Be.CSS_RESULTS)
+        node = parser(html).css_first(CSS_RESULTS)
         soap: ReceivedData = ReceivedData(node, datetime.datetime(2020, 1, 1, 10, 30))
-        res = Be.parsing_results(soap, SportType.FOOTBALL, championship_id, IS_RESULT)
+        res = parsing_results(soap, SportType.FOOTBALL, championship_id, IS_RESULT)
         assert not DeepDiff(pars, res['stages'])
         assert not DeepDiff(pars_match, res['matches'],
                             exclude_paths=["root[0]['save_date']", "root[0]['download_date']",
@@ -1605,38 +1636,39 @@ class TestGetResults:
             },
         ]
 
-        async with Be(
-                database=settings.SQLALCHEMY_TEST_DATABASE_URI,
-                root_dir=settings.DOWNLOAD_TEST_DIRECTORY,
-        ) as be:
-            be.load_net = False
-            res = await be.get_results('/football/england/fa-cup/', SportType.FOOTBALL, championship_id, IS_RESULT, False)
-            assert not DeepDiff(pars, res['stages'])
-            assert not DeepDiff(pars_match, res['matches'],
-                                exclude_paths=["root[0]['save_date']", "root[0]['download_date']",
-                                               "root[1]['save_date']", "root[1]['download_date']",
-                                               "root[0]['home_team']['download_date']",
-                                               "root[0]['home_team']['save_date']",
-                                               "root[0]['away_team']['download_date']",
-                                               "root[0]['away_team']['save_date']",
-                                               "root[1]['home_team']['download_date']",
-                                               "root[1]['home_team']['save_date']",
-                                               "root[1]['away_team']['download_date']",
-                                               "root[1]['away_team']['save_date']"])
+        ls = LoadSave(
+            root_url='https://www.betexplorer.com',
+            root_dir=settings.DOWNLOAD_TEST_DIRECTORY,
+        )
 
-            res = await be.get_results('/football/england/fa-cup/', SportType.FOOTBALL, championship_id, IS_FIXTURE, False)
-            assert not DeepDiff(pars, res['stages'])
-            assert not DeepDiff(pars_match_fix, res['matches'],
-                                exclude_paths=["root[0]['save_date']", "root[0]['download_date']",
-                                               "root[1]['save_date']", "root[1]['download_date']",
-                                               "root[0]['home_team']['download_date']",
-                                               "root[0]['home_team']['save_date']",
-                                               "root[0]['away_team']['download_date']",
-                                               "root[0]['away_team']['save_date']",
-                                               "root[1]['home_team']['download_date']",
-                                               "root[1]['home_team']['save_date']",
-                                               "root[1]['away_team']['download_date']",
-                                               "root[1]['away_team']['save_date']"])
+        ls.load_net = False
+        res = await get_results('/football/england/fa-cup/', SportType.FOOTBALL, championship_id, IS_RESULT, False)
+        assert not DeepDiff(pars, res['stages'])
+        assert not DeepDiff(pars_match, res['matches'],
+                            exclude_paths=["root[0]['save_date']", "root[0]['download_date']",
+                                           "root[1]['save_date']", "root[1]['download_date']",
+                                           "root[0]['home_team']['download_date']",
+                                           "root[0]['home_team']['save_date']",
+                                           "root[0]['away_team']['download_date']",
+                                           "root[0]['away_team']['save_date']",
+                                           "root[1]['home_team']['download_date']",
+                                           "root[1]['home_team']['save_date']",
+                                           "root[1]['away_team']['download_date']",
+                                           "root[1]['away_team']['save_date']"])
+
+        res = await get_results('/football/england/fa-cup/', SportType.FOOTBALL, championship_id, IS_FIXTURE, False)
+        assert not DeepDiff(pars, res['stages'])
+        assert not DeepDiff(pars_match_fix, res['matches'],
+                            exclude_paths=["root[0]['save_date']", "root[0]['download_date']",
+                                           "root[1]['save_date']", "root[1]['download_date']",
+                                           "root[0]['home_team']['download_date']",
+                                           "root[0]['home_team']['save_date']",
+                                           "root[0]['away_team']['download_date']",
+                                           "root[0]['away_team']['save_date']",
+                                           "root[1]['home_team']['download_date']",
+                                           "root[1]['home_team']['save_date']",
+                                           "root[1]['away_team']['download_date']",
+                                           "root[1]['away_team']['save_date']"])
 
 class TestGetTeam:
 
@@ -1661,22 +1693,25 @@ class TestGetTeam:
         fast_team: dict[(int, int, str, str, str), Optional[TeamBetexplorer]] = {}
         session = None
 
-        async with Be(
-                database=settings.SQLALCHEMY_TEST_DATABASE_URI,
-                root_dir=settings.DOWNLOAD_TEST_DIRECTORY,
-        ) as be:
-            be.load_net = False
-            be.save_database = DATABASE_NOT_USE
-            await be.get_team(session, [team], fast_country, fast_team)
-            assert team['team_country'] == 'England'
-            assert team['team_emblem'] == '/res/images/team-logo/MmmU7K6n-b92lfEJC.png'
-            assert team['country_id'] == 1
+        ls = LoadSave(
+            root_url='https://www.betexplorer.com',
+            root_dir=settings.DOWNLOAD_TEST_DIRECTORY,
+        )
 
-            ft = fast_team.get(team['team_url'])
-            assert ft is not None
-            ft['team_id'] = 1
-            await be.get_team(session, [team], fast_country, fast_team)
-            assert team['team_id'] == 1
+        ls.load_net = False
+        ls.save_database = DATABASE_NOT_USE
+        crd = CRUDbetexplorer(save_database=DATABASE_NOT_USE)
+
+        await get_team(ls, crd, session, [team], fast_country, fast_team)
+        assert team['team_country'] == 'England'
+        assert team['team_emblem'] == '/res/images/team-logo/MmmU7K6n-b92lfEJC.png'
+        assert team['country_id'] == 1
+
+        ft = fast_team.get(team['team_url'])
+        assert ft is not None
+        ft['team_id'] = 1
+        await get_team(ls, crd, session, [team], fast_country, fast_team)
+        assert team['team_id'] == 1
 
 
 class TestGetResultsFixtures:
@@ -1851,27 +1886,28 @@ class TestGetResultsFixtures:
 
         pars_match.extend(pars_match_fix)
 
-        async with Be(
-                database=settings.SQLALCHEMY_TEST_DATABASE_URI,
-                root_dir=settings.DOWNLOAD_TEST_DIRECTORY,
-        ) as be:
-            be.load_net = False
-            res = await be.get_results_fixtures('/football/england/fa-cup/', SportType.FOOTBALL, championship_id, False)
-            assert not DeepDiff(pars, res['stages'])
-            assert not DeepDiff(pars_match, res['matches'], exclude_paths=[
-                "root[0]['save_date']", "root[0]['download_date']",
-                "root[1]['save_date']", "root[1]['download_date']",
-                "root[2]['save_date']", "root[2]['download_date']",
-                "root[0]['home_team']['download_date']",
-                "root[0]['home_team']['save_date']",
-                "root[0]['away_team']['download_date']",
-                "root[0]['away_team']['save_date']",
-                "root[1]['home_team']['download_date']",
-                "root[1]['home_team']['save_date']",
-                "root[1]['away_team']['download_date']",
-                "root[1]['away_team']['save_date']",
-                "root[2]['home_team']['download_date']",
-                "root[2]['home_team']['save_date']",
-                "root[2]['away_team']['download_date']",
-                "root[2]['away_team']['save_date']",
-                ])
+        ls = LoadSave(
+            root_url='https://www.betexplorer.com',
+            root_dir=settings.DOWNLOAD_TEST_DIRECTORY,
+        )
+
+        ls.load_net = False
+        res = await get_results_fixtures(ls, '/football/england/fa-cup/', SportType.FOOTBALL, championship_id, False)
+        assert not DeepDiff(pars, res['stages'])
+        assert not DeepDiff(pars_match, res['matches'], exclude_paths=[
+            "root[0]['save_date']", "root[0]['download_date']",
+            "root[1]['save_date']", "root[1]['download_date']",
+            "root[2]['save_date']", "root[2]['download_date']",
+            "root[0]['home_team']['download_date']",
+            "root[0]['home_team']['save_date']",
+            "root[0]['away_team']['download_date']",
+            "root[0]['away_team']['save_date']",
+            "root[1]['home_team']['download_date']",
+            "root[1]['home_team']['save_date']",
+            "root[1]['away_team']['download_date']",
+            "root[1]['away_team']['save_date']",
+            "root[2]['home_team']['download_date']",
+            "root[2]['home_team']['save_date']",
+            "root[2]['away_team']['download_date']",
+            "root[2]['away_team']['save_date']",
+            ])

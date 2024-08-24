@@ -1,7 +1,7 @@
 """Схемы описания структур системы."""
 import datetime
 import enum
-from typing import Optional, TypedDict
+from typing import Optional, TypedDict, Final
 
 
 class SportType(enum.Enum):
@@ -135,6 +135,7 @@ class TeamBetexplorer(TypedDict):
     save_date: Optional[datetime.datetime]
     """"Дата сохранения информации в базе данных."""
 
+
 class ScoreHalvesBetexplorer(TypedDict):
     """Результат тайма, периода, дополнительного времени."""
 
@@ -182,6 +183,31 @@ class ChampionshipStageBetexplorer(TypedDict):
     """Текущая стадия чемпионата."""
 
 
+EVENT_BTC: Final[int] = 0
+"""Ставка: обе забьют"""
+EVENT_OU: Final[int] = 1
+"""Ставка: больше-меньше"""
+EVENT_AH: Final[int] = 2
+"""Ставка: фора"""
+
+
+class MatchEventBetexplorer(TypedDict):
+    """Статистика матча."""
+
+    match_event_id: Optional[int]
+    """Идентификатор события в матче."""
+    match_id: Optional[int]
+    """Идентификатор матча."""
+    event_type_id: Optional[int]
+    """Идентификатор типа события (обе забьют, тотал, фора)."""
+    indicator: Optional[str]
+    """Значение показателя (тотала, форы)."""
+    odds_less: Optional[float]
+    """Коэффициент на меньше."""
+    odds_greater: Optional[float]
+    """Коэффициент на больше."""
+
+
 class MatchBetexplorer(TypedDict):
     """Результат матча."""
 
@@ -221,6 +247,8 @@ class MatchBetexplorer(TypedDict):
     """Таймы матча."""
     shooters: list[ShooterBetexplorer]
     """Кто забивал голы."""
+    match_event: list[MatchEventBetexplorer]
+    """Статистика матча."""
     download_date: Optional[datetime.datetime]
     """Дата-время загрузки информации."""
     save_date: Optional[datetime.datetime]

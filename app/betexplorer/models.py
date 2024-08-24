@@ -209,6 +209,7 @@ class Match(Base):
     away_team: Mapped['Team'] = relationship('Team', foreign_keys=[away_team_id], back_populates='match')
     time_score: Mapped[List['TimeScore']] = relationship('TimeScore', uselist=True, back_populates='match')
     shooter: Mapped[List['Shooter']] = relationship('Shooter', uselist=True, back_populates='match')
+    match_event: Mapped[List['Shooter']] = relationship('MatchEvent', uselist=True, back_populates='match')
 
 
 class TimeScore(Base):
@@ -282,3 +283,26 @@ class ChampionshipStage(Base):
     stage_current: Mapped[Optional[int]] = mapped_column(Integer, nullable=False, comment='Текущая стадия')
 
     championship: Mapped['Championship'] = relationship('Championship', back_populates='championship_stage')
+
+
+class MatchEvent(Base):
+    """События в матче."""
+
+    __tablename__ = 'match_event'
+    # __table_args__ = {'schema': 'betexplorer'}  # noqa: ERA001
+    __table_args__ = (
+        PrimaryKeyConstraint('match_event_id', name='match_event_pkey'),
+        ForeignKeyConstraint(['match_id'], ['match.match_id'], name='fk_event_match'),
+        {'comment': 'События в матче'},
+    )
+
+    match_event_id: Mapped[Optional[int]] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                                          autoincrement=True, comment='Идентификатор события в матче')
+    match_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
+    event_type_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=False, comment='Идентификатор типа события')
+    indicator: Mapped[Optional[str]] = mapped_column(String(255), nullable=True,
+                                                     comment='Значение показателя (тотала, форы)')
+    odds_less: Mapped[Optional[float]] = mapped_column(Float, nullable=True, comment='Коэффициент на меньше')
+    odds_greater: Mapped[Optional[float]] = mapped_column(Float, nullable=True, comment='Коэффициент на больше')
+
+    match: Mapped['Match'] = relationship('Match', back_populates='match_event')

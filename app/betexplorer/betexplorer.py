@@ -16,17 +16,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
 from app.betexplorer.schemas import (
+    EVENT_BTC,
     SPORTS,
     ChampionshipBetexplorer,
     ChampionshipStageBetexplorer,
     CountryBetexplorer,
     MatchBetexplorer,
+    MatchEventBetexplorer,
     ResultsBetexplorer,
     ScoreHalvesBetexplorer,
     ShooterBetexplorer,
     SportType,
     TeamBetexplorer,
-    sports_url,
+    sports_url, EVENT_OU, EVENT_AH,
 )
 from app.database import DatabaseSessionManager
 from app.utilbase import LoadSave, ReceivedData
@@ -85,6 +87,32 @@ COLUMN_MAPPING_SHOOTER: Final[dict] = {
     (1, 0, True): COLUMN_EVENT_TIME,
     (0, 2, True): COLUMN_PLAYER_NAME,
     (1, 1, True): COLUMN_PLAYER_NAME,
+}
+
+COLUMN_BTC_NAME: Final[int] = 0
+COLUMN_BTC_YES: Final[int] = 1
+COLUMN_BTC_NO: Final[int] = 2
+
+COLUMN_MAPPING_BTC: Final[dict] = {
+    0: COLUMN_BTC_NAME,
+    1: COLUMN_BTC_NAME,
+    2: COLUMN_BTC_YES,
+    3: COLUMN_BTC_NO,
+}
+
+COLUMN_OU_BOOKMAKER: Final[int] = 0
+COLUMN_OU_DESKTOP: Final[int] = 1
+COLUMN_OU_INDICATOR: Final[int] = 2
+COLUMN_OU_OVER: Final[int] = 3
+COLUMN_OU_UNDER: Final[int] = 4
+
+COLUMN_MAPPING_OU: Final[dict] = {
+    0: COLUMN_OU_BOOKMAKER,
+    1: COLUMN_OU_BOOKMAKER,
+    2: COLUMN_OU_DESKTOP,
+    3: COLUMN_OU_INDICATOR,
+    4: COLUMN_OU_OVER,
+    5: COLUMN_OU_UNDER,
 }
 
 REG_ROUND: re.Pattern = re.compile(r'^\d+?(?=. Round)')
@@ -192,7 +220,9 @@ def parsing_odds(item: Node) -> Optional[float]:
     :param item: Колонка с коэффициентом
     """
     if (f_kef := item.attrs.get('data-odd')) is not None:
-        return float(f_kef)
+        return float(f_kef) if f_kef else None
+    if item.child is None:
+        return None
     return float(odds.attrs['data-odd']) if (odds := item.child.css_first(
         '[data-odd]')) is not None else None
 
@@ -415,6 +445,26 @@ def get_column_type_shooters(sport_id: SportType, tab_index: int, column_number:
     )
 
 
+def get_column_type_btc(column_number: int) -> Optional[int]:
+    """Определить тип колонки для обе забьют.
+
+    :param column_number: Номер колонки (от 0)
+    """
+    return COLUMN_MAPPING_BTC.get(
+        column_number,
+    )
+
+
+def get_column_type_ou(column_number: int) -> Optional[int]:
+    """Определить тип колонки для больше меньше.
+
+    :param column_number: Номер колонки (от 0)
+    """
+    return COLUMN_MAPPING_OU.get(
+        column_number,
+    )
+
+
 def parsing_shooters(sport_id: SportType, table_data: Node, tab_index: int) -> list[ShooterBetexplorer]:
     """Разбор забивающих голы.
 
@@ -569,6 +619,7 @@ def match_init(
         'score_stage': None, 'score_stage_short': None,
         'score_halves': [],
         'shooters': [],
+        'match_event': [],
         'stage_name': stage_name,
         'round_name': round_name,
         'round_number': round_number,
@@ -886,6 +937,80 @@ async def get_match_time(
     return None
 
 
+def parsing_btc(
+        soup: Optional[ReceivedData],
+        sport_id: SportType) -> Optional[MatchEventBetexplorer]:
+    """Разбор страницы обе забьют.
+
+    :param soup: Данные для разбора
+    :param sport_id: Вид спорта
+    """
+    ret: MatchEventBetexplorer | None = None
+    if soup is not None and (event_item := soup.node.css_first('tfoot tr')) is not None:
+        odds_less: float | None = None
+        odds_greater: float | None = None
+        for index, item in enumerate(event_item.iter(include_text=False)):
+            column_type: Optional[int] = get_column_type_btc(index)
+            if column_type == COLUMN_BTC_YES:
+                odds_less = parsing_odds(item)
+            if column_type == COLUMN_BTC_NO:
+                odds_greater = parsing_odds(item)
+        if (odds_less is not None) and (odds_greater is not None):
+            ret = {
+                'match_event_id': None,
+                'match_id': None,
+                'event_type_id': EVENT_BTC,
+                'indicator': None,
+                'odds_less': odds_less,
+                'odds_greater': odds_greater,
+            }
+    return ret
+
+
+def parsing_ou(
+        soup: Optional[ReceivedData],
+        sport_id: SportType,
+        event_type_id: int) -> list[MatchEventBetexplorer]:
+    """Разбор страницы больше-меньше.
+
+    :param soup: Данные для разбора
+    :param sport_id: Вид спорта
+    :param event_type_id: Идентификатор типа события (обе забьют, тотал, фора)
+    """
+    ret: list[MatchEventBetexplorer] = []
+    if soup is not None:
+        for table in soup.node.css('table.table-main'):
+            indicator: str | None = None
+            if (event_item := table.css_first('tbody tr')) is not None:
+                for index, item in enumerate(event_item.iter(include_text=False)):
+                    column_type: Optional[int] = get_column_type_ou(index)
+                    if column_type == COLUMN_OU_INDICATOR:
+                        indicator = item.text(deep=False, strip=True)
+                        break
+
+            if (event_item := table.css_first('tfoot tr')) is not None:
+                odds_less: float | None = None
+                odds_greater: float | None = None
+                for index, item in enumerate(event_item.iter(include_text=False)):
+                    column_type: Optional[int] = get_column_type_btc(index)
+                    if column_type == COLUMN_BTC_YES:
+                        odds_less = parsing_odds(item)
+                        continue
+                    if column_type == COLUMN_BTC_NO:
+                        odds_greater = parsing_odds(item)
+                        continue
+                if (indicator is not None) and (odds_less is not None) and (odds_greater is not None):
+                    ret.append( {
+                        'match_event_id': None,
+                        'match_id': None,
+                        'event_type_id': event_type_id,
+                        'indicator': indicator,
+                        'odds_less': odds_less,
+                        'odds_greater': odds_greater,
+                    })
+    return ret
+
+
 async def get_match_line(
         ls: LoadSave,
         sport_id: SportType,
@@ -905,9 +1030,20 @@ async def get_match_line(
         match_bet: str = [x for x in urlparse(match['match_url']).path.split('/') if x][-1]
 
         if sport_id in [SportType.FOOTBALL, SportType.HOCKEY]:
-            await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/bts/1/'), '')
-        await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ou/1/'), '')
-        await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ah/1/'), '')
+            load_btc: Optional[ReceivedData]
+            pbe: MatchEventBetexplorer | None
+            if (load_btc := await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/bts/1/'), '')) is not None and (pbe := parsing_btc(load_btc, sport_id)) is not None:  # noqa: E501
+                match['match_event'].append(pbe)
+
+        load_ou: Optional[ReceivedData]
+        pou: list[MatchEventBetexplorer] | None
+        if (load_ou := await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ou/1/'), '')) is not None and (pou := parsing_ou(load_ou, sport_id, EVENT_OU)) is not None:  # noqa: E501
+            match['match_event'].extend(pou)
+
+        load_ah: Optional[ReceivedData]
+        pah: list[MatchEventBetexplorer] | None
+        if (load_ah := await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ah/1/'), '')) is not None and (pah := parsing_ou(load_ah, sport_id, EVENT_AH)) is not None:  # noqa: E501
+            match['match_event'].extend(pah)
     # await ls.get_read(
     #     self, urljoin('/match-odds/', [x for x in urlparse(match['match_url']).path.split('/') if x][-1] + '/1/ou/'),
     #     '',
