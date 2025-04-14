@@ -1035,10 +1035,10 @@ async def get_match_line(
             if (load_btc := await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/bts/1/'), '')) is not None and (pbe := parsing_btc(load_btc, sport_id)) is not None:  # noqa: E501
                 match['match_event'].append(pbe)
 
-        load_ou: Optional[ReceivedData]
-        pou: list[MatchEventBetexplorer] | None
-        if (load_ou := await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ou/1/'), '')) is not None and (pou := parsing_ou(load_ou, sport_id, EVENT_OU)) is not None:  # noqa: E501
-            match['match_event'].extend(pou)
+        # load_ou: Optional[ReceivedData]
+        # pou: list[MatchEventBetexplorer] | None
+        # if (load_ou := await ls.get_read(urljoin('/match-odds-old/', match_bet + '/1/ou/1/'), '')) is not None and (pou := parsing_ou(load_ou, sport_id, EVENT_OU)) is not None:  # noqa: E501
+        #     match['match_event'].extend(pou)
 
         load_ah: Optional[ReceivedData]
         pah: list[MatchEventBetexplorer] | None

@@ -1,12 +1,13 @@
 """Работа с базой данных."""
 import collections.abc
-from typing import TYPE_CHECKING, Callable, Final, Optional, Union
+import datetime
+from typing import TYPE_CHECKING, Callable, Final, Optional, TypedDict, Union
 
-from sqlalchemy import Dialect, Select, TextClause, bindparam, inspect, select, text, types
+from sqlalchemy import Dialect, Row, Select, TextClause, bindparam, inspect, select, text, types, union
 from sqlalchemy.dialects.postgresql import insert as postgresql_upsert
 from sqlalchemy.dialects.sqlite import insert as sqlite_upsert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import aliased, joinedload
 from sqlalchemy.orm.decl_api import DeclarativeAttributeIntercept
 
 from app.betexplorer.models import (
@@ -30,9 +31,8 @@ from app.betexplorer.schemas import (
     TeamBetexplorer,
 )
 
-if TYPE_CHECKING:
-    import datetime
-
+# if TYPE_CHECKING:
+#     import datetime
 
 upsert_mapping = {
     'postgresql': postgresql_upsert,
@@ -536,14 +536,180 @@ class CRUDbetexplorer:
         #         )
         #         championship_stage['stage_id'] = stage_id
         #         return stage_id
-        match_insert = [ChampionshipStage(
-            championship_id=championship_id,
-            stage_url=championship_stage['stage_url'],
-            stage_name=championship_stage['stage_name'],
-            stage_order=championship_stage['stage_order'],
-            stage_current=championship_stage['stage_current'],
-        ) for championship_stage in championship_stages]
+        match_insert = [
+            ChampionshipStage(
+                championship_id=championship_id,
+                stage_url=championship_stage['stage_url'],
+                stage_name=championship_stage['stage_name'],
+                stage_order=championship_stage['stage_order'],
+                stage_current=championship_stage['stage_current'],
+            )
+            for championship_stage in championship_stages
+        ]
         session.add_all(match_insert)
         # await session.flush()
         # championship_stage['stage_id'] = match_insert.stage_id
         # return match_insert.stage_id
+
+    class ChampionshipResult(TypedDict):
+        """Информация об чемпионате."""
+
+        championship_id: Optional[int]
+        sport_name: Optional[str]
+        country_name: Optional[str]
+        championship_name: Optional[str]
+        championship_years: Optional[str]
+
+    async def championship_find(self,
+                                session: AsyncSession,
+                                championship_id: int) -> Optional[ChampionshipResult]:
+        """Поиск чемпионата.
+
+            :param session: Текущая сессия
+            :param championship_id: Идентификатор чемпионата
+
+        SELECT
+          championship.championship_id,
+          sport.sport_name,
+          country.country_name,
+          championship.championship_name,
+          championship.championship_years
+        FROM
+          public.championship
+          JOIN public.sport ON sport.sport_id = championship.sport_id
+          JOIN public.country ON country.country_id = championship.country_id
+        WHERE
+          championship.championship_id = 10818;
+        """
+        if self.save_database == DATABASE_NOT_USE:
+            return None
+        async with session.begin():
+            championship_rec: Row = (await session.execute(
+                select(
+                    Championship.championship_id,
+                    Sport.sport_name,
+                    Country.country_name,
+                    Championship.championship_name,
+                    Championship.championship_years,
+                )
+                .join(Sport, Sport.sport_id == Championship.sport_id)
+                .join(Country, Country.country_id == Championship.country_id)
+                .where(Championship.championship_id == championship_id),
+            )).one_or_none()
+        return championship_rec._asdict()  # noqa: SLF001, RUF100
+
+
+    class ChampionshipTeamsResult(TypedDict):
+        """Информация о комндах-участницах чемпионата."""
+
+        team_id: Optional[int]
+        team_name: Optional[str]
+
+    async def championship_teams(self,
+                                 session: AsyncSession,
+                                 championship_id: int) -> list[ChampionshipTeamsResult]:
+        """Поиск всех команд играющих в чемпионате.
+
+                :param session: Текущая сессия
+                :param championship_id: Идентификатор чемпионата
+
+        SELECT
+          t_home.team_id,
+          t_home.team_name
+        FROM public."match"
+          LEFT JOIN team t_home ON
+            public."match".home_team_id = t_home.team_id
+        WHERE
+          public."match".championship_id = 10818
+        UNION
+        SELECT
+          t_away.team_id,
+          t_away.team_name
+        FROM public."match"
+          LEFT JOIN team t_away ON
+            public."match".away_team_id = t_away.team_id
+        WHERE
+          public."match".championship_id = 10818
+        ORDER BY
+          2;
+        """
+        if self.save_database == DATABASE_NOT_USE:
+            return []
+
+        t_home = aliased(Team, name='t_home')
+        t_away = aliased(Team, name='t_away')
+
+        stmt = (
+            union(
+                select(t_home.team_id, t_home.team_name)
+                .select_from(Match)
+                .outerjoin(t_home, Match.home_team_id == t_home.team_id)
+                .where(Match.championship_id == championship_id),
+                select(t_away.team_id, t_away.team_name)
+                .select_from(Match)
+                .outerjoin(t_away, Match.away_team_id == t_away.team_id)
+                .where(Match.championship_id == championship_id),
+            )
+            .order_by(t_home.team_name)
+        )
+
+        async with session.begin():
+            teams_rec = await session.execute(
+                stmt,
+            )
+        return [dict(row) for row in teams_rec.mappings()]
+
+
+    class ChampionshipMatchResult(TypedDict):
+        """Информация о результате матча."""
+
+        match_id: Optional[int]
+        game_date: Optional[datetime.datetime]
+        home_team_name: Optional[str]
+        away_team_name: Optional[str]
+        home_score: Optional[int]
+        away_score: Optional[int]
+        time_score_home: Optional[int]
+        time_score_away: Optional[int]
+
+    async def championship_matches(self,
+                                   session: AsyncSession,
+                                   championship_id: int) -> list[ChampionshipMatchResult]:
+        """Поиск всех матчей чемпионата.
+
+        :param session: Текущая сессия
+        :param championship_id: Идентификатор чемпионата
+
+        SELECT match_id, game_date, t_home.team_name, t_away.team_name, match.home_score, match.away_score,
+          time_score.home_score, time_score.away_score
+        FROM public."match"
+        LEFT JOIN team t_home ON public."match".home_team_id = t_home.team_id
+        LEFT JOIN team t_away ON public."match".away_team_id = t_away.team_id
+        LEFT JOIN public.time_score ON time_score.match_id = match.match_id AND time_score.half_number = 1
+        where public."match".championship_id = 10818
+        order by game_date ASC;
+        """
+        if self.save_database == DATABASE_NOT_USE:
+            return []
+        t_home = aliased(Team)
+        t_away = aliased(Team)
+
+        async with session.begin():
+            championship_rec = await session.execute(
+                select(
+                    Match.match_id,
+                    Match.game_date,
+                    t_home.team_name.label('home_team_name'),
+                    t_away.team_name.label('away_team_name'),
+                    Match.home_score,
+                    Match.away_score,
+                    TimeScore.home_score.label('time_score_home'),
+                    TimeScore.away_score.label('time_score_away'),
+                )
+                .outerjoin(t_home, Match.home_team_id == t_home.team_id)
+                .outerjoin(t_away, Match.away_team_id == t_away.team_id)
+                .outerjoin(TimeScore, (TimeScore.match_id == Match.match_id) & (TimeScore.half_number == 1))
+                .where(Match.championship_id == championship_id)
+                .order_by(Match.game_date),
+            )
+        return [dict(row) for row in championship_rec.mappings()]

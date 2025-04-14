@@ -18,7 +18,7 @@ class Settings:
 
     # CONFIG_DATABASE: ClassVar[dict] = {
     #     'echo': False,
-    #     'pool_recycle': 120,  # перезапускать соединения по истечении заданного количества секунд
+    #     'pool_recycle': 120, # перезапускать соединения по истечении заданного количества секунд
     #     'connect_args': {'check_same_thread': False, 'timeout': 120},
     #     'poolclass': StaticPool,
     # }
@@ -32,8 +32,11 @@ class Settings:
     }
     """Конфигурация движка базы данных."""
 
-    DOWNLOAD_DIRECTORY: str = os.path.join('f' + os.sep, 'download', 'betexplorer')
+    DOWNLOAD_DIRECTORY: str = os.path.join('f:' + os.sep, 'download', 'betexplorer')
     """Каталог для загрузки страниц с сайта."""
+
+    FBCUP_DIRECTORY: str = os.path.join('d:' + os.sep, 'FBcup')
+    """Каталог для вывода данных в формате FBcup."""
 
     DOWNLOAD_TEST_DIRECTORY: str = os.path.join(os.path.abspath(os.getcwd()), 'download', 'betexplorer')
     """Каталог для загрузки страниц с сайта (для тестов)."""

@@ -1,9 +1,9 @@
 """Обеспечение операций ввода-вывода с сайта и жесткого диска."""
 import asyncio
-import datetime
-import multiprocessing
 from contextlib import nullcontext
+import datetime
 from email.utils import parsedate_to_datetime
+import multiprocessing
 import os
 from typing import TYPE_CHECKING, Callable, NamedTuple, Optional, Union
 from urllib.parse import parse_qsl, urljoin, urlparse

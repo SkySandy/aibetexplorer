@@ -1,11 +1,11 @@
-"""Загрузка данных с сайта BetExplorer."""
+"""Сохранение данных в формате FBcup."""
 import asyncio
 import io
 import sys
 import time
 import timeit
 
-from app.betexplorer.betexplorer import load_data
+from app.fbcup.tofbcup import to_fbcup
 from app.config import settings
 
 
@@ -18,8 +18,8 @@ async def load() -> None:
     )
     st = timeit.default_timer()
     st_p = time.process_time()
-    await load_data(
-        root_dir=settings.DOWNLOAD_DIRECTORY,
+    await to_fbcup(
+        root_dir=settings.FBCUP_DIRECTORY,
         database=settings.SQLALCHEMY_DATABASE_URI,
         sport_type=settings.SPORT_TYPE,
         load_net=settings.LOAD_NET,
