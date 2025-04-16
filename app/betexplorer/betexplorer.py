@@ -16,7 +16,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
 from app.betexplorer.schemas import (
+    EVENT_AH,
     EVENT_BTC,
+    EVENT_OU,
     SPORTS,
     ChampionshipBetexplorer,
     ChampionshipStageBetexplorer,
@@ -28,7 +30,7 @@ from app.betexplorer.schemas import (
     ShooterBetexplorer,
     SportType,
     TeamBetexplorer,
-    sports_url, EVENT_OU, EVENT_AH,
+    sports_url,
 )
 from app.database import DatabaseSessionManager
 from app.utilbase import LoadSave, ReceivedData
@@ -179,7 +181,7 @@ async def get_countries(ls: LoadSave, url: str, need_refresh: bool = False) -> O
     """Загрузка страницы стран.
 
     :param ls: Класс для работы с файлами
-    :param url: Адрес страницы для разборы
+    :param url: Адрес страницы для разбора
     :param need_refresh: Необходимо обновить данные
     """
     load_countries: Optional[ReceivedData]

@@ -163,6 +163,7 @@ class Match(Base):
         ForeignKeyConstraint(['championship_id'], ['championship.championship_id'], name='fk_match_championship'),
         ForeignKeyConstraint(['home_team_id'], ['team.team_id'], name='fk_match_home_team'),
         PrimaryKeyConstraint('match_id', name='match_pkey', postgresql_fillfactor=50),
+        Index('match_championship_id', 'championship_id', unique=False),
         {'comment': 'Матчи'},
     )
 
@@ -220,6 +221,7 @@ class TimeScore(Base):
     __table_args__ = (
         PrimaryKeyConstraint('time_id', name='time_pkey', postgresql_fillfactor=50),
         ForeignKeyConstraint(['match_id'], ['match.match_id'], name='fk_time_match'),
+        Index('time_match_id', 'match_id', unique=False),
         {'comment': 'Результаты по таймам'},
     )
 
@@ -243,6 +245,7 @@ class Shooter(Base):
     __table_args__ = (
         PrimaryKeyConstraint('shooter_id', name='shooter_pkey', postgresql_fillfactor=50),
         ForeignKeyConstraint(['match_id'], ['match.match_id'], name='fk_shooter_match'),
+        Index('shooter_imatch_id', 'match_id', unique=False),
         {'comment': 'Голы и минуты'},
     )
 
@@ -293,6 +296,7 @@ class MatchEvent(Base):
     __table_args__ = (
         PrimaryKeyConstraint('match_event_id', name='match_event_pkey'),
         ForeignKeyConstraint(['match_id'], ['match.match_id'], name='fk_event_match'),
+        Index('event_match_id', 'match_id', unique=False),
         {'comment': 'События в матче'},
     )
 

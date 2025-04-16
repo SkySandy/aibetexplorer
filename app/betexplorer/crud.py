@@ -3,12 +3,26 @@ import collections.abc
 import datetime
 from typing import TYPE_CHECKING, Callable, Final, Optional, TypedDict, Union
 
-from sqlalchemy import Dialect, Row, Select, TextClause, bindparam, inspect, select, text, types, union
-from sqlalchemy.dialects.postgresql import insert as postgresql_upsert
+from sqlalchemy import (
+    Dialect,
+    Row,
+    Select,
+    TextClause,
+    bindparam,
+    func,
+    inspect,
+    literal_column,
+    select,
+    text,
+    types,
+    union,
+)
+from sqlalchemy.dialects.postgresql import aggregate_order_by, insert as postgresql_upsert
 from sqlalchemy.dialects.sqlite import insert as sqlite_upsert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, joinedload
 from sqlalchemy.orm.decl_api import DeclarativeAttributeIntercept
+from sqlalchemy.sql.expression import literal
 
 from app.betexplorer.models import (
     Championship,
@@ -16,6 +30,7 @@ from app.betexplorer.models import (
     Country,
     CountrySport,
     Match,
+    MatchEvent,
     Shooter,
     Sport,
     Team,
@@ -713,3 +728,176 @@ class CRUDbetexplorer:
                 .order_by(Match.game_date),
             )
         return [dict(row) for row in championship_rec.mappings()]
+
+    async def get_countries_by_sport(self, session: AsyncSession, sport_id: SportType) -> list[CountryBetexplorer]:
+        """Получить все страны для указанного вида спорта.
+
+        :param session: Текущая сессия
+        :param sport_id: Вид спорта, для которого выбираются страны
+        """
+        if self.save_database == DATABASE_NOT_USE:
+            return []
+
+        query = (
+            select(
+                Country.country_id,
+                Country.country_name,
+                Country.country_flag_url,
+                CountrySport.country_url,
+                CountrySport.country_order
+            )
+            .join(Country, CountrySport.country_id == Country.country_id)
+            .where(CountrySport.sport_id == sport_id.value)
+        )
+        async with session.begin():
+            result = await session.execute(query)
+        return [dict(row) for row in result.mappings()]
+
+    async def get_matches_by_sport(self, session: AsyncSession, championship_id: int) -> list[MatchBetexplorer]:
+        """Получить все матчи для указанного вида спорта.
+
+                :param session: Текущая сессия
+                :param championship_id: Идентификатор чемпионата
+        SELECT
+          match.match_id,
+          ( SELECT
+            to_json (item)
+          FROM ( SELECT
+            team.team_name AS team_name,
+            team.team_full AS team_full,
+            country.country_name AS country_name
+          FROM public.team
+          JOIN public.country ON team.country_id = country.country_id
+          WHERE
+            (public.match.home_team_id = public.team.team_id) ) item ) AS items
+        FROM public.match
+        WHERE
+          match.match_id = 1000;
+
+        SELECT
+          match.match_id,
+          (SELECT
+            json_agg(json_build_object('time_id', time_score.time_id, 'half_number', time_score.half_number, 'home_score', time_score.home_score, 'away_score', time_score.away_score) ORDER BY half_number) AS json_agg_1
+          FROM time_score
+          WHERE
+            time_score.match_id = match.match_id) AS score_halves
+        FROM match
+        WHERE
+          match.match_id = 315;
+        """
+        if self.save_database == DATABASE_NOT_USE:
+            return []
+
+        query = (
+            select(
+                Match.match_id,
+                Match.championship_id,
+                Match.match_url,
+                select(
+                    func.to_json(
+                        func.json_build_object(
+                            text("'team_id'"), Team.team_id,
+                            text("'sport_id'"), Team.sport_id,
+                            text("'team_name'"), Team.team_name,
+                            text("'team_full'"), Team.team_full,
+                            text("'team_url'"), Team.team_url,
+                            text("'team_country'"), Country.country_name,
+                            text("'country_id'"), Team.country_id,
+                            text("'team_emblem'"), Team.team_emblem,
+                            text("'download_date'"), Team.download_date,
+                            text("'save_date'"), Team.save_date
+                        )
+                    )
+                )
+                .join(Country, Team.country_id == Country.country_id)
+                .where(Team.team_id == Match.home_team_id)
+                .scalar_subquery()
+                .label('home_team'),
+                Match.home_team_emblem,
+                select(
+                    func.to_json(
+                        func.json_build_object(
+                            text("'team_id'"), Team.team_id,
+                            text("'sport_id'"), Team.sport_id,
+                            text("'team_name'"), Team.team_name,
+                            text("'team_full'"), Team.team_full,
+                            text("'team_url'"), Team.team_url,
+                            text("'team_country'"), Country.country_name,
+                            text("'country_id'"), Team.country_id,
+                            text("'team_emblem'"), Team.team_emblem,
+                            text("'download_date'"), Team.download_date,
+                            text("'save_date'"), Team.save_date
+                        )
+                    )
+                )
+                .join(Country, Team.country_id == Country.country_id)
+                .where(Team.team_id == Match.away_team_id)
+                .scalar_subquery()
+                .label('away_team'),
+                Match.away_team_emblem,
+                Match.home_score,
+                Match.away_score,
+                Match.odds_1,
+                Match.odds_x,
+                Match.odds_2,
+                Match.game_date,
+                Match.score_stage,
+                Match.score_stage_short,
+                Match.stage_name,
+                select(
+                    func.json_agg(aggregate_order_by(
+                        func.json_build_object(
+                            text("'time_id'"), TimeScore.time_id,
+                            text("'half_number'"), TimeScore.half_number,
+                            text("'home_score'"), TimeScore.home_score,
+                            text("'away_score'"), TimeScore.away_score
+                        ), TimeScore.half_number)
+                    )
+                )
+                .where(TimeScore.match_id == Match.match_id)
+                .scalar_subquery()
+                .label('score_halves'),
+                select(
+                    func.json_agg(aggregate_order_by(
+                        func.json_build_object(
+                            text("'shooter_id'"), Shooter.shooter_id,
+                            text("'home_away'"), Shooter.home_away,
+                            text("'event_time'"), Shooter.event_time,
+                            text("'overtime'"), Shooter.overtime,
+                            text("'player_name'"), Shooter.player_name,
+                            text("'penalty_kick'"), Shooter.penalty_kick,
+                            text("'event_order'"), Shooter.event_order
+                        ), Shooter.event_time)
+                    )
+                )
+                .where(Shooter.match_id == Match.match_id)
+                .scalar_subquery()
+                .label('shooters'),
+                select(
+                    func.json_agg(aggregate_order_by(
+                        func.json_build_object(
+                            text("'match_event_id'"), MatchEvent.match_event_id,
+                            text("'match_id'"), MatchEvent.match_id,
+                            text("'event_type_id'"), MatchEvent.event_type_id,
+                            text("'indicator'"), MatchEvent.indicator,
+                            text("'odds_less'"), MatchEvent.odds_less,
+                            text("'odds_greater'"), MatchEvent.odds_greater
+                        ), MatchEvent.event_type_id)
+                    )
+                )
+                .where(MatchEvent.match_id == Match.match_id)
+                .scalar_subquery()
+                .label('match_event'),
+                Match.download_date,
+                Match.save_date,
+                Match.round_name,
+                Match.round_number,
+                Match.is_fixture
+            )
+            .where(Match.championship_id == championship_id)
+            .order_by(Match.game_date)
+        )
+
+        async with session.begin():
+            result = await session.execute(query)
+        return [dict(row) for row in result.mappings()]

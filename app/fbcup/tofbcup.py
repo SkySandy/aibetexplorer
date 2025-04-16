@@ -1,5 +1,5 @@
 """Функции выгрузки данных в формате FBcup."""
-import datetime
+import datetime  # noqa: I001
 import os
 from itertools import count
 from typing import Optional
@@ -7,7 +7,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
-from app.betexplorer.schemas import SportType
+from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
 from app.utils import save_list
 
@@ -166,19 +166,19 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
     :param session: Текущая сессия базы данных
     :param championship_id: Идентификатор чемпионата
     """
-    match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
-        session, championship_id)
+    countries: list[CountryBetexplorer] = await crd.get_countries_by_sport(session, SportType.FOOTBALL)
+    match_details: list[MatchBetexplorer] = await crd.get_matches_by_sport(session, championship_id)
+    # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
+    #     session, championship_id)
     match_strings: list[str] = []
     for detail in match_details:
         game_date_str = detail['game_date'].strftime('%d.%m.%Y') if detail['game_date'] else ' ' * 10
-        score_str = f' {detail["home_score"]}:{detail["away_score"]}' if detail['home_score'] is not None else ''
-        time_score_str = (
-            f' ({detail["time_score_home"]}:{detail["time_score_away"]})'
-            if detail['time_score_home'] is not None
-            else ''
-        )
+        score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
+        time_score_str = ''
+        if detail['score_halves'] is not None:
+            time_score_str = ' (' + ','.join(str(i['home_score']) + ':' + str(i['away_score']) for i in detail['score_halves']) + ')'
         match_string = (
-            f'{game_date_str} {detail["home_team_name"]} - {detail["away_team_name"]}{score_str}{time_score_str}'
+            f'{game_date_str} {detail['home_team']['team_name']} - {detail['away_team']['team_name']}{score_str}{time_score_str}'
         )
         match_strings.append(match_string)
     match_strings.append('[END]')
