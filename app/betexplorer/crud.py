@@ -615,7 +615,7 @@ class CRUDbetexplorer:
 
 
     class ChampionshipTeamsResult(TypedDict):
-        """Информация о комндах-участницах чемпионата."""
+        """Информация о командах-участницах чемпионата."""
 
         team_id: Optional[int]
         team_name: Optional[str]
@@ -744,7 +744,7 @@ class CRUDbetexplorer:
                 Country.country_name,
                 Country.country_flag_url,
                 CountrySport.country_url,
-                CountrySport.country_order
+                CountrySport.country_order,
             )
             .join(Country, CountrySport.country_id == Country.country_id)
             .where(CountrySport.sport_id == sport_id.value)
@@ -777,7 +777,9 @@ class CRUDbetexplorer:
         SELECT
           match.match_id,
           (SELECT
-            json_agg(json_build_object('time_id', time_score.time_id, 'half_number', time_score.half_number, 'home_score', time_score.home_score, 'away_score', time_score.away_score) ORDER BY half_number) AS json_agg_1
+            json_agg(json_build_object('time_id', time_score.time_id, 'half_number', time_score.half_number,
+                                       'home_score', time_score.home_score, 'away_score', time_score.away_score)
+                                        ORDER BY half_number) AS json_agg_1
           FROM time_score
           WHERE
             time_score.match_id = match.match_id) AS score_halves
@@ -805,9 +807,9 @@ class CRUDbetexplorer:
                             text("'country_id'"), Team.country_id,
                             text("'team_emblem'"), Team.team_emblem,
                             text("'download_date'"), Team.download_date,
-                            text("'save_date'"), Team.save_date
-                        )
-                    )
+                            text("'save_date'"), Team.save_date,
+                        ),
+                    ),
                 )
                 .join(Country, Team.country_id == Country.country_id)
                 .where(Team.team_id == Match.home_team_id)
@@ -826,9 +828,9 @@ class CRUDbetexplorer:
                             text("'country_id'"), Team.country_id,
                             text("'team_emblem'"), Team.team_emblem,
                             text("'download_date'"), Team.download_date,
-                            text("'save_date'"), Team.save_date
-                        )
-                    )
+                            text("'save_date'"), Team.save_date,
+                        ),
+                    ),
                 )
                 .join(Country, Team.country_id == Country.country_id)
                 .where(Team.team_id == Match.away_team_id)
@@ -850,9 +852,9 @@ class CRUDbetexplorer:
                             text("'time_id'"), TimeScore.time_id,
                             text("'half_number'"), TimeScore.half_number,
                             text("'home_score'"), TimeScore.home_score,
-                            text("'away_score'"), TimeScore.away_score
-                        ), TimeScore.half_number)
-                    )
+                            text("'away_score'"), TimeScore.away_score,
+                        ), TimeScore.half_number),
+                    ),
                 )
                 .where(TimeScore.match_id == Match.match_id)
                 .scalar_subquery()
@@ -866,9 +868,9 @@ class CRUDbetexplorer:
                             text("'overtime'"), Shooter.overtime,
                             text("'player_name'"), Shooter.player_name,
                             text("'penalty_kick'"), Shooter.penalty_kick,
-                            text("'event_order'"), Shooter.event_order
-                        ), Shooter.event_time)
-                    )
+                            text("'event_order'"), Shooter.event_order,
+                        ), Shooter.event_time),
+                    ),
                 )
                 .where(Shooter.match_id == Match.match_id)
                 .scalar_subquery()
@@ -881,9 +883,9 @@ class CRUDbetexplorer:
                             text("'event_type_id'"), MatchEvent.event_type_id,
                             text("'indicator'"), MatchEvent.indicator,
                             text("'odds_less'"), MatchEvent.odds_less,
-                            text("'odds_greater'"), MatchEvent.odds_greater
-                        ), MatchEvent.event_type_id)
-                    )
+                            text("'odds_greater'"), MatchEvent.odds_greater,
+                        ), MatchEvent.event_type_id),
+                    ),
                 )
                 .where(MatchEvent.match_id == Match.match_id)
                 .scalar_subquery()
@@ -892,7 +894,7 @@ class CRUDbetexplorer:
                 Match.save_date,
                 Match.round_name,
                 Match.round_number,
-                Match.is_fixture
+                Match.is_fixture,
             )
             .where(Match.championship_id == championship_id)
             .order_by(Match.game_date)

@@ -1,7 +1,7 @@
 """Функции выгрузки данных в формате FBcup."""
 import datetime  # noqa: I001
 import os
-from itertools import count
+from decimal import Decimal
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -157,6 +157,50 @@ async def print_championship_teams(
     team_strings.append('[END]')
     return team_strings
 
+ONE = Decimal('1')
+HUNDRED = Decimal('100')
+PRECISION = Decimal('.01')
+
+def odds_to_prob(odds: float) -> float:
+    """Вычисляет вероятность события на основе коэффициента, с учетом маржи, с округлением до двух десятичных знаков.
+
+    :param odds: Букмекерский коэффициент ставку
+    """
+    return float((HUNDRED / Decimal(odds)).quantize(PRECISION))
+
+def calc_margin(odds_1: float, odds_2: float, odds_x: Optional[float] = None) -> float:
+    """Вычисляет маржу в процентах на основе коэффициентов с округлением до двух десятичных знаков.
+
+    :param odds_1: Букмекерский коэффициент за победу
+    :param odds_2: Букмекерский коэффициент за поражение
+    :param odds_x: Букмекерский коэффициент за ничью. Если None, функция рассчитывает маржу только для двух исходов
+    :return: Маржа букмекера в процентах
+
+    Если `odds_x` не указан или равен None, функция поддерживает двухсторонние ставки.
+    """
+    if odds_x is None:
+        return float(((HUNDRED / Decimal(odds_1)) + (HUNDRED / Decimal(odds_2)) - HUNDRED).quantize(PRECISION))
+    return float((HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) + HUNDRED / Decimal(odds_x) - HUNDRED).quantize(PRECISION))
+
+def calc_prob(odds: float, odds_1: float, odds_2: Optional[float] = None) -> float:
+    """Вычисляет вероятность события на основе коэффициента, с округлением до двух десятичных знаков.
+
+    :param odds: Букмекерский коэффициент ставку
+    :param odds_1: Букмекерский коэффициент 1
+    :param odds_2: Букмекерский коэффициент 2. Если None, функция рассчитывает вероятность только для двух исходов
+    """
+    if odds_2 is None:
+        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION))
+    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION))
+
+def calc_double_odds(odds_1: float, odds_2: float) -> float:
+    """Вычисляет вероятность двойного события на основе коэффициента, с округлением до двух десятичных знаков.
+
+    :param odds_1: Букмекерский коэффициент 1
+    :param odds_2: Букмекерский коэффициент 2
+    """
+    return float((HUNDRED / (HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2))).quantize(PRECISION))
+
 
 async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[AsyncSession],
                                      championship_id: int) -> list[str]:
@@ -176,9 +220,34 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
         score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
         time_score_str = ''
         if detail['score_halves'] is not None:
-            time_score_str = ' (' + ','.join(str(i['home_score']) + ':' + str(i['away_score']) for i in detail['score_halves']) + ')'
+            time_score_str = (
+                ' ('
+                + ','.join(str(i['home_score']) + ':' + str(i['away_score']) for i in detail['score_halves'])
+                + ')'
+            )
+
+        odds_str = ''
+        if detail['odds_1'] is not None:
+            # Вероятность с учетом маржи (%)
+            prob_margin_1: float = odds_to_prob(detail['odds_1'])
+            prob_margin_x: float = odds_to_prob(detail['odds_x'])
+            prob_margin_2: float = odds_to_prob(detail['odds_2'])
+
+            margin: float = calc_margin(detail['odds_1'], detail['odds_x'], detail['odds_2'])
+
+            # Вероятность чистая (%)
+            prob_1: float = calc_prob(detail['odds_1'], detail['odds_2'], detail['odds_x'])
+            prob_x: float = calc_prob(detail['odds_x'], detail['odds_1'], detail['odds_2'])
+            prob_2: float = calc_prob(detail['odds_2'], detail['odds_1'], detail['odds_x'])
+
+            odds_1x: float = calc_double_odds(detail['odds_1'], detail['odds_x'])
+            odds_x2: float = calc_double_odds(detail['odds_x'], detail['odds_2'])
+            odds_12: float = calc_double_odds(detail['odds_1'], detail['odds_2'])
+
+            odds_str = f' b:[{detail['odds_1']} {detail['odds_x']} {detail['odds_2']} {odds_1x} {odds_12} {odds_x2}]'
+
         match_string = (
-            f'{game_date_str} {detail['home_team']['team_name']} - {detail['away_team']['team_name']}{score_str}{time_score_str}'
+            f'{game_date_str} {detail['home_team']['team_name']} - {detail['away_team']['team_name']}{score_str}{time_score_str}{odds_str}'
         )
         match_strings.append(match_string)
     match_strings.append('[END]')
