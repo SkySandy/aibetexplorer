@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
 from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
+from app.fbcup.rating import MatchRating, calc_rating
 from app.utils import save_list
 
 
@@ -214,8 +215,10 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
     match_details: list[MatchBetexplorer] = await crd.get_matches_by_sport(session, championship_id)
     # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
     #     session, championship_id)
+    match_ratings: list[MatchRating] = []
     match_strings: list[str] = []
     for detail in match_details:
+        calc_rating(match_ratings, detail)
         game_date_str = detail['game_date'].strftime('%d.%m.%Y') if detail['game_date'] else ' ' * 10
         score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
         time_score_str = ''
