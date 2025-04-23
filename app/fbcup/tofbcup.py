@@ -1,7 +1,7 @@
 """Функции выгрузки данных в формате FBcup."""
 import datetime  # noqa: I001
 import os
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
 from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
+from app.fbcup.forecast import MatchForecast, calc_forecast
 from app.fbcup.rating import MatchRating, calc_rating
 from app.utils import save_list
 
@@ -167,7 +168,7 @@ def odds_to_prob(odds: float) -> float:
 
     :param odds: Букмекерский коэффициент ставку
     """
-    return float((HUNDRED / Decimal(odds)).quantize(PRECISION))
+    return float((HUNDRED / Decimal(odds)).quantize(PRECISION, ROUND_HALF_UP))
 
 def calc_margin(odds_1: float, odds_2: float, odds_x: Optional[float] = None) -> float:
     """Вычисляет маржу в процентах на основе коэффициентов с округлением до двух десятичных знаков.
@@ -180,8 +181,8 @@ def calc_margin(odds_1: float, odds_2: float, odds_x: Optional[float] = None) ->
     Если `odds_x` не указан или равен None, функция поддерживает двухсторонние ставки.
     """
     if odds_x is None:
-        return float(((HUNDRED / Decimal(odds_1)) + (HUNDRED / Decimal(odds_2)) - HUNDRED).quantize(PRECISION))
-    return float((HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) + HUNDRED / Decimal(odds_x) - HUNDRED).quantize(PRECISION))
+        return float(((HUNDRED / Decimal(odds_1)) + (HUNDRED / Decimal(odds_2)) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
+    return float((HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) + HUNDRED / Decimal(odds_x) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
 
 def calc_prob(odds: float, odds_1: float, odds_2: Optional[float] = None) -> float:
     """Вычисляет вероятность события на основе коэффициента, с округлением до двух десятичных знаков.
@@ -191,8 +192,8 @@ def calc_prob(odds: float, odds_1: float, odds_2: Optional[float] = None) -> flo
     :param odds_2: Букмекерский коэффициент 2. Если None, функция рассчитывает вероятность только для двух исходов
     """
     if odds_2 is None:
-        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION))
-    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION))
+        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))
+    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))
 
 def calc_double_odds(odds_1: float, odds_2: float) -> float:
     """Вычисляет вероятность двойного события на основе коэффициента, с округлением до двух десятичных знаков.
@@ -200,7 +201,7 @@ def calc_double_odds(odds_1: float, odds_2: float) -> float:
     :param odds_1: Букмекерский коэффициент 1
     :param odds_2: Букмекерский коэффициент 2
     """
-    return float((HUNDRED / (HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2))).quantize(PRECISION))
+    return float((HUNDRED / (HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2))).quantize(PRECISION, ROUND_HALF_UP))
 
 
 async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[AsyncSession],
@@ -216,9 +217,11 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
     # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
     #     session, championship_id)
     match_ratings: list[MatchRating] = []
+    match_forecasts: list[MatchForecast] = []
     match_strings: list[str] = []
     for detail in match_details:
         calc_rating(match_ratings, detail)
+        calc_forecast(match_forecasts, match_ratings, match_details, detail)
         game_date_str = detail['game_date'].strftime('%d.%m.%Y') if detail['game_date'] else ' ' * 10
         score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
         time_score_str = ''
