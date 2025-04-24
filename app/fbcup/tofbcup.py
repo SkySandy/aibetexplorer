@@ -9,7 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
 from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
-from app.fbcup.forecast import MatchForecast, calc_forecast
+from app.fbcup.forecast import MatchForecast, create_team_chances
+from app.fbcup.statistic import MatchStatistics, create_match_statistics
 from app.fbcup.rating import MatchRating, calc_rating
 from app.utils import save_list
 
@@ -217,11 +218,14 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
     # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
     #     session, championship_id)
     match_ratings: list[MatchRating] = []
+    match_statistics: list[MatchStatistics] = []
     match_forecasts: list[MatchForecast] = []
     match_strings: list[str] = []
     for detail in match_details:
-        calc_rating(match_ratings, detail)
-        calc_forecast(match_forecasts, match_ratings, match_details, detail)
+        match_statistic = create_match_statistics(match_statistics, match_details, detail)
+        match_rating = calc_rating(match_ratings, detail)
+        create_team_chances(match_forecasts, match_statistic, match_rating, detail)
+
         game_date_str = detail['game_date'].strftime('%d.%m.%Y') if detail['game_date'] else ' ' * 10
         score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
         time_score_str = ''
