@@ -2,6 +2,7 @@
 import datetime  # noqa: I001
 import os
 from decimal import Decimal, ROUND_HALF_UP
+from tkinter.font import names
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -221,10 +222,11 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
     match_statistics: list[MatchStatistics] = []
     match_forecasts: list[MatchForecast] = []
     match_strings: list[str] = []
+    match_strings_forecast: list[str] = []
     for detail in match_details:
         match_statistic = create_match_statistics(match_statistics, match_details, detail)
         match_rating = calc_rating(match_ratings, detail)
-        create_team_chances(match_forecasts, match_statistic, match_rating, detail)
+        match_chance = create_team_chances(match_forecasts, match_statistic, match_rating, detail)
 
         game_date_str = detail['game_date'].strftime('%d.%m.%Y') if detail['game_date'] else ' ' * 10
         score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
@@ -260,6 +262,25 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
             f'{game_date_str} {detail['home_team']['team_name']} - {detail['away_team']['team_name']}{score_str}{time_score_str}{odds_str}'
         )
         match_strings.append(match_string)
+
+        game_date_str_2 = detail['game_date'].strftime('%d.%m.%y') if detail['game_date'] else ' ' * 8
+        command_names = f'{detail['home_team']['team_name']} - {detail['away_team']['team_name']}'
+        percent_1 = f'({match_chance["forecast"]["win_prob"]}-{match_chance["forecast"]["draw_prob"]}-{match_chance["forecast"]["defeat_prob"]})'
+        time_score_str_2 = ''
+        if detail['score_halves'] is not None:
+            time_score_str_2 = (
+                '('
+                + ';'.join(str(i['home_score']) + ':' + str(i['away_score']) for i in detail['score_halves'])
+                + ')'
+            )
+        schet_1 = f'{match_chance['forecast']['home_forecast']}:{match_chance['forecast']['away_forecast']}'
+        score_str_2 = f'{detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
+
+        match_chance_str = (
+            f'       {command_names: <40}{game_date_str_2} =={score_str_2} {time_score_str_2}==               {schet_1: <4}{percent_1: <4}'
+        )
+        match_strings_forecast.append(match_chance_str)
+
     match_strings.append('[END]')
     return match_strings
 

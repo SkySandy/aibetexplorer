@@ -194,7 +194,7 @@ def scan_matches(matches: list[MatchBetexplorer], team_statistics: FieldTypeTota
 PRECISION = Decimal('.01')
 
 
-def calc_avg(sum_value: int, count: int) -> float:
+def calc_avg(sum_value: float, count: int) -> float:
     """Посчитывает среднее с округлением до двух знаков.
 
     :param sum_value: Итого
@@ -208,7 +208,7 @@ def calc_avg(sum_value: int, count: int) -> float:
 HUNDRED = Decimal(100)
 
 
-def calc_avg_percent(sum_value: int, count: int) -> int:
+def calc_avg_percent(sum_value: float, count: int) -> int:
     """Вычисляет среднее значение в процентах с округлением до целого числа.
 
     :param sum_value: Итого
@@ -231,11 +231,18 @@ def update_goal_statistics_averages(statistics: GoalStatistics) -> None:
 
     statistics['goals_scored_avg'] = calc_avg(statistics['goals_scored'], count_matches)
     statistics['goals_conceded_avg'] = calc_avg(statistics['goals_conceded'], count_matches)
-    statistics['goals_total_avg'] = float(Decimal(statistics['goals_scored_avg']) + Decimal(statistics['goals_conceded_avg']))
+    statistics['goals_total_avg'] = float(
+        Decimal(statistics['goals_scored_avg']) + Decimal(statistics['goals_conceded_avg'])
+    )
 
-    statistics['win_percent'] = calc_avg_percent(statistics['win'], count_matches)
-    statistics['defeat_percent'] = calc_avg_percent(statistics['defeat'], count_matches)
-    statistics['draw_percent'] = PERCENT_TOTAL - (statistics['win_percent'] + statistics['defeat_percent'])
+    if statistics['win'] == 0 and statistics['draw'] == 0 and statistics['defeat'] == 0:
+        statistics['win_percent'] = 33
+        statistics['defeat_percent'] = 33
+        statistics['draw_percent'] = 33
+    else:
+        statistics['win_percent'] = calc_avg_percent(statistics['win'], count_matches)
+        statistics['defeat_percent'] = calc_avg_percent(statistics['defeat'], count_matches)
+        statistics['draw_percent'] = PERCENT_TOTAL - (statistics['win_percent'] + statistics['defeat_percent'])
 
     statistics['goals_scored_win_avg'] = calc_avg(statistics['goals_scored_win'], statistics['win'])
     statistics['goals_conceded_win_avg'] = calc_avg(statistics['goals_conceded_win'], statistics['win'])
@@ -277,6 +284,9 @@ def calc_teams_statistics_before_match(
     scan_matches(home_matches, home_statistics, home_team_id)
     scan_matches(away_matches, away_statistics, away_team_id)
 
+    update_all_field_statistics(home_statistics)
+    update_all_field_statistics(away_statistics)
+
     return home_statistics, away_statistics
 
 
@@ -293,6 +303,8 @@ def create_match_statistics(
     :param championship_matches: Список матчей чемпионата (должны быть отсортированы в хронологическом порядке)
     :param detail: Информация о матче
     """
+    if detail['match_id'] == 1627053:
+        pass
     home_statistics, away_statistics = calc_teams_statistics_before_match(championship_matches, detail)
     match_stat: MatchStatistics = {
         'match_id': detail['match_id'],
