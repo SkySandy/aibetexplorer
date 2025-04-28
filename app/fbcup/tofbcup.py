@@ -11,6 +11,7 @@ from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsag
 from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
 from app.fbcup.forecast import MatchForecast, create_team_chances
+from app.fbcup.forecast_summary import calc_forecast_summary
 from app.fbcup.statistic import MatchStatistics, create_match_statistics
 from app.fbcup.rating import MatchRating, calc_rating
 from app.utils import save_list
@@ -274,14 +275,13 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
                 + ')'
             )
         schet_1 = f'{match_chance['forecast']['home_forecast']}:{match_chance['forecast']['away_forecast']}'
-        score_str_2 = f'{detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''
+        score_str_2 = f'{detail["home_score"]}:{detail["away_score"]}' if detail['home_score'] is not None else ''
 
-        match_chance_str = (
-            f'       {command_names: <40}{game_date_str_2} =={score_str_2} {time_score_str_2}==               {schet_1: <4}{percent_1: <4}'
-        )
+        match_chance_str = f'       {command_names: <40}{game_date_str_2} =={score_str_2} {time_score_str_2}==               {schet_1: <4}{percent_1: <4}'
         match_strings_forecast.append(match_chance_str)
 
     match_strings.append('[END]')
+    f_s = calc_forecast_summary(match_details, match_forecasts)
     return match_strings
 
 
