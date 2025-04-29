@@ -4,6 +4,7 @@ from typing import TypedDict
 from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.forecast import MatchForecast
 from app.fbcup.statistic import calc_avg_percent
+from app.fbcup.utils import calc_total_percent
 
 
 class ForecastSummaryDetailed(TypedDict):
@@ -81,21 +82,6 @@ class ForecastSummary(TypedDict):
     """Предсказано тотал домашней команды."""
     total_away: ForecastTotalDetailed
     """Итого тотал команды гостей."""
-
-
-def calc_total_percent(under: int, equals: int, over: int) -> dict[str, int]:
-    """Рассчитывает процентное распределение «меньше», «равно» и «больше» по количеству каждого случая.
-
-    :param under:Количество случаев «меньше».
-    :param equals: Количество случаев «равно».
-    :param over: Количество случаев «больше».
-    """
-    count = under + equals + over
-    return {
-        'under_percent': calc_avg_percent(under, count),
-        'equals_percent': calc_avg_percent(equals, count),
-        'over_percent': calc_avg_percent(over, count),
-    }
 
 
 def calc_forecast_summary(

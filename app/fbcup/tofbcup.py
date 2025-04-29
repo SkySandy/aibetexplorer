@@ -1,9 +1,6 @@
 """Функции выгрузки данных в формате FBcup."""
 import datetime  # noqa: I001
 import os
-from decimal import Decimal, ROUND_HALF_UP
-from tkinter.font import names
-from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,10 +11,11 @@ from app.fbcup.forecast import MatchForecast, create_team_chances
 from app.fbcup.forecast_summary import calc_forecast_summary
 from app.fbcup.statistic import MatchStatistics, create_match_statistics
 from app.fbcup.rating import MatchRating, calc_rating
+from app.fbcup.utils import odds_to_prob, calc_margin, calc_prob, calc_double_odds
 from app.utils import save_list
 
 
-async def save_championship(crd: CRUDbetexplorer, session: Optional[AsyncSession],
+async def save_championship(crd: CRUDbetexplorer, session: AsyncSession| None,
                             root_dir: str, championship_id: int) -> None:
     """Сохраняет данные о чемпионатах в формате FBcup.
 
@@ -36,6 +34,7 @@ async def save_championship(crd: CRUDbetexplorer, session: Optional[AsyncSession
     await save_list(os.path.join(dir_adr, file_name_teams), team_strings, datetime.datetime.now())
     await save_list(os.path.join(dir_adr, file_name_matches), match_strings, datetime.datetime.now())
 
+
 BLACK = 0
 RED = 16711680
 GREEN = 65280
@@ -52,8 +51,9 @@ DARK_YELLOW = 32896
 DARK_MAGENTA = 8388736
 DARK_CYAN = 12632256
 
+
 async def print_championship_teams(
-        crd: CRUDbetexplorer, session: Optional[AsyncSession],
+        crd: CRUDbetexplorer, session: AsyncSession| None,
         championship_id: int,
         file_name_matches: str) -> list[str]:
     """Выводит на экран информацию о матчах указанного чемпионата.
@@ -162,52 +162,8 @@ async def print_championship_teams(
     team_strings.append('[END]')
     return team_strings
 
-ONE = Decimal('1')
-HUNDRED = Decimal('100')
-PRECISION = Decimal('.01')
 
-def odds_to_prob(odds: float) -> float:
-    """Вычисляет вероятность события на основе коэффициента, с учетом маржи, с округлением до двух десятичных знаков.
-
-    :param odds: Букмекерский коэффициент ставку
-    """
-    return float((HUNDRED / Decimal(odds)).quantize(PRECISION, ROUND_HALF_UP))
-
-def calc_margin(odds_1: float, odds_2: float, odds_x: Optional[float] = None) -> float:
-    """Вычисляет маржу в процентах на основе коэффициентов с округлением до двух десятичных знаков.
-
-    :param odds_1: Букмекерский коэффициент за победу
-    :param odds_2: Букмекерский коэффициент за поражение
-    :param odds_x: Букмекерский коэффициент за ничью. Если None, функция рассчитывает маржу только для двух исходов
-    :return: Маржа букмекера в процентах
-
-    Если `odds_x` не указан или равен None, функция поддерживает двухсторонние ставки.
-    """
-    if odds_x is None:
-        return float(((HUNDRED / Decimal(odds_1)) + (HUNDRED / Decimal(odds_2)) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
-    return float((HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) + HUNDRED / Decimal(odds_x) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
-
-def calc_prob(odds: float, odds_1: float, odds_2: Optional[float] = None) -> float:
-    """Вычисляет вероятность события на основе коэффициента, с округлением до двух десятичных знаков.
-
-    :param odds: Букмекерский коэффициент ставку
-    :param odds_1: Букмекерский коэффициент 1
-    :param odds_2: Букмекерский коэффициент 2. Если None, функция рассчитывает вероятность только для двух исходов
-    """
-    if odds_2 is None:
-        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))
-    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))
-
-def calc_double_odds(odds_1: float, odds_2: float) -> float:
-    """Вычисляет вероятность двойного события на основе коэффициента, с округлением до двух десятичных знаков.
-
-    :param odds_1: Букмекерский коэффициент 1
-    :param odds_2: Букмекерский коэффициент 2
-    """
-    return float((HUNDRED / (HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2))).quantize(PRECISION, ROUND_HALF_UP))
-
-
-async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[AsyncSession],
+async def print_championship_matches(crd: CRUDbetexplorer, session: AsyncSession | None,
                                      championship_id: int) -> list[str]:
     """Выводит на экран информацию о матчах указанного чемпионата.
 
@@ -287,14 +243,14 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: Optional[Asy
 
 async def to_fbcup(
         root_dir: str,
-        database: Optional[str] = None,
-        sport_type: Optional[list[SportType]] = None,
+        database: str | None = None,
+        sport_type: list[SportType] | None = None,
         load_net: bool = False,
         save_database: DatabaseUsage = DATABASE_NOT_USE,
         create_tables: int = 0,
-        config_engine: Optional[dict] = None,
-        start_updating: Optional[datetime.datetime] = None,
-        exclude_countries: Optional[tuple] = None,
+        config_engine: dict | None = None,
+        start_updating: datetime.datetime | None = None,
+        exclude_countries: tuple | None = None,
         processes: int = 1) -> None:
     """Первоначальная Загрузка данных спортивных состязаний всех чемпионатов во всех странах.
 

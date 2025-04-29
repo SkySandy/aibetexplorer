@@ -1,11 +1,11 @@
 """Расчет предсказаний результатов матчей."""
 
-from decimal import ROUND_HALF_DOWN, ROUND_HALF_UP, Decimal
 from typing import TypedDict
 
 from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.rating import MatchRating
 from app.fbcup.statistic import MatchStatistics, calc_avg
+from app.fbcup.utils import rounds_goal, rounds_whole
 
 
 class ForecastInfo(TypedDict):
@@ -44,27 +44,6 @@ class MatchForecast(TypedDict):
     """"Прогноз (все игры + рейтинг)."""
     forecast_average: ForecastInfo | None
     """"Прогноз (среднее)."""
-
-def rounds_whole(sum_value: float, count: int) -> int:
-    """Округляет до целого числа.
-
-    :param sum_value: Итого
-    :param count: Количество
-    """
-    if count == 0:
-        return 0
-    return int((Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_UP))
-
-
-def rounds_goal(sum_value: float, count: int) -> int:
-    """Округляет до целого числа с учетом, что 0.5 округляется в меньшую сторону.
-
-    :param sum_value: Итого
-    :param count: Количество
-    """
-    if count == 0:
-        return 0
-    return int((Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_DOWN))
 
 
 def create_forecast(
@@ -163,4 +142,3 @@ def create_team_chances(
     }
     match_forecasts.append(m_f)
     return m_f
-
