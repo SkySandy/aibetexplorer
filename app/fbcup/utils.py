@@ -2,7 +2,32 @@
 
 from decimal import ROUND_HALF_DOWN, ROUND_HALF_UP, Decimal
 
-from app.fbcup.statistic import calc_avg_percent
+PRECISION = Decimal('.01')
+
+
+def calc_avg(sum_value: float, count: int) -> float:
+    """Посчитывает среднее с округлением до двух знаков.
+
+    :param sum_value: Итого
+    :param count: Количество
+    """
+    if count == 0:
+        return 0
+    return float((Decimal(sum_value) / Decimal(count)).quantize(PRECISION, ROUND_HALF_UP))
+
+
+HUNDRED = Decimal(100)
+
+
+def calc_avg_percent(sum_value: float, count: int) -> int:
+    """Вычисляет среднее значение в процентах с округлением до целого числа.
+
+    :param sum_value: Итого
+    :param count: Количество
+    """
+    if count == 0:
+        return 0
+    return int((HUNDRED * Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_UP))
 
 
 def calc_total_percent(under: int, equals: int, over: int) -> dict[str, int]:
@@ -43,8 +68,6 @@ def rounds_goal(sum_value: float, count: int) -> int:
 
 
 ONE = Decimal(1)
-HUNDRED = Decimal(100)
-PRECISION = Decimal('.01')
 
 
 def odds_to_prob(odds: float) -> float:

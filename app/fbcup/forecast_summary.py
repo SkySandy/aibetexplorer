@@ -3,17 +3,7 @@ from typing import TypedDict
 
 from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.forecast import MatchForecast
-from app.fbcup.statistic import calc_avg_percent
-from app.fbcup.utils import calc_total_percent
-
-
-class ForecastSummaryDetailed(TypedDict):
-    """Подробная расшифровка прогнозов."""
-
-    count: int
-    """Количество угаданных прогнозов."""
-    percent: int
-    """Процент угаданных прогнозов."""
+from app.fbcup.utils import calc_avg_percent, calc_total_percent
 
 
 class ForecastGoalsDetailed(TypedDict):
@@ -29,17 +19,13 @@ class ForecastGoalsDetailed(TypedDict):
     """Всего голов забитых обеими командами."""
 
 
-class ForecastTotalDetailed(TypedDict):
-    """Подробная расшифровка тотала в прогнозе."""
+class ForecastSummaryDetailed(TypedDict):
+    """Подробная расшифровка прогнозов."""
 
     count: int
-    """Предсказано всего."""
-    under_percent: int
-    """Процент предсказанного тотала меньше реального."""
-    equals_percent: int
-    """Процент предсказанного тотала равного реальному."""
-    over_percent: int
-    """Процент предсказанного тотала больше реального."""
+    """Количество угаданных прогнозов."""
+    percent: int
+    """Процент угаданных прогнозов."""
 
 
 class ForecastResultDetailed(TypedDict):
@@ -53,6 +39,19 @@ class ForecastResultDetailed(TypedDict):
     """Процент угаданных прогнозов."""
 
 
+class ForecastTotalDetailed(TypedDict):
+    """Подробная расшифровка тотала в прогнозе."""
+
+    count: int
+    """Предсказано всего."""
+    under_percent: int
+    """Процент предсказанного тотала меньше реального."""
+    equals_percent: int
+    """Процент предсказанного тотала равного реальному."""
+    over_percent: int
+    """Процент предсказанного тотала больше реального."""
+
+
 class ForecastSummary(TypedDict):
     """Итоги предсказания матчей."""
 
@@ -63,13 +62,13 @@ class ForecastSummary(TypedDict):
     goals_forecast: ForecastGoalsDetailed
     """Суммарная информация о предсказанных голах."""
     exact_score: ForecastSummaryDetailed
-    """Точный счет футбольного матча."""
+    """Предсказанный точный счет."""
     differences: ForecastSummaryDetailed
     """Предсказанные разницы."""
     outcomes: ForecastSummaryDetailed
     """Предсказанные исходы."""
     sum_forecast: ForecastSummaryDetailed
-    """Итого предсказано."""
+    """Сумма всех прогнозируемых результатов."""
     win: ForecastResultDetailed
     """Предсказанные победы."""
     draw: ForecastResultDetailed
@@ -77,11 +76,11 @@ class ForecastSummary(TypedDict):
     defeat: ForecastResultDetailed
     """Предсказанные поражения."""
     total: ForecastTotalDetailed
-    """Итого предсказано."""
+    """Предсказано тотал."""
     total_home: ForecastTotalDetailed
     """Предсказано тотал домашней команды."""
     total_away: ForecastTotalDetailed
-    """Итого тотал команды гостей."""
+    """Предсказано тотал команды гостей."""
 
 
 def calc_forecast_summary(
@@ -123,14 +122,15 @@ def calc_forecast_summary(
         away_score = detail['away_score']
         if home_score is None or away_score is None:
             continue
+
         forecast = forecast_map[detail['match_id']]
+        home_score_forecast = forecast['forecast']['home_forecast']
+        away_score_forecast = forecast['forecast']['away_forecast']
 
         match_count += 1
         goals_scored += home_score
         goals_conceded += away_score
 
-        home_score_forecast = forecast['forecast']['home_forecast']
-        away_score_forecast = forecast['forecast']['away_forecast']
         goals_scored_forecast += home_score_forecast
         goals_conceded_forecast += away_score_forecast
 
@@ -144,15 +144,18 @@ def calc_forecast_summary(
 
         # Предсказанный исход
         elif (
-                ((home_score > away_score) and (home_score_forecast > away_score_forecast))
-                or ((home_score == away_score) and (home_score_forecast == away_score_forecast))
-                or ((home_score < away_score) and (home_score_forecast < away_score_forecast))):
+            ((home_score > away_score) and (home_score_forecast > away_score_forecast))
+            or ((home_score == away_score) and (home_score_forecast == away_score_forecast))
+            or ((home_score < away_score) and (home_score_forecast < away_score_forecast))
+        ):
             outcomes_count += 1
 
         # Предсказано общий тотал
-        if home_score + away_score == home_score_forecast + away_score_forecast:
+        actual_total = home_score + away_score
+        forecast_total = home_score_forecast + away_score_forecast
+        if actual_total == forecast_total:
             total_count += 1
-        elif home_score + away_score < home_score_forecast + away_score_forecast:
+        elif actual_total < forecast_total:
             total_under += 1
         else:
             total_over += 1
@@ -173,6 +176,7 @@ def calc_forecast_summary(
         else:
             total_away_over += 1
 
+        # Предсказано победа, ничья, поражение
         if home_score_forecast > away_score_forecast:
             win_count += 1
             if home_score > away_score:

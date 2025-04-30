@@ -1,9 +1,10 @@
 """Расчет статистики перед матчем."""
 
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import Decimal
 from typing import TypedDict
 
 from app.betexplorer.schemas import MatchBetexplorer
+from app.fbcup.utils import calc_avg, calc_avg_percent
 
 
 class GoalStatistics(TypedDict):
@@ -191,34 +192,6 @@ def scan_matches(matches: list[MatchBetexplorer], team_statistics: FieldTypeTota
         update_team_stats(team_stats, match_info, playing_at_home)
 
 
-PRECISION = Decimal('.01')
-
-
-def calc_avg(sum_value: float, count: int) -> float:
-    """Посчитывает среднее с округлением до двух знаков.
-
-    :param sum_value: Итого
-    :param count: Количество
-    """
-    if count == 0:
-        return 0
-    return float((Decimal(sum_value) / Decimal(count)).quantize(PRECISION, ROUND_HALF_UP))
-
-
-HUNDRED = Decimal(100)
-
-
-def calc_avg_percent(sum_value: float, count: int) -> int:
-    """Вычисляет среднее значение в процентах с округлением до целого числа.
-
-    :param sum_value: Итого
-    :param count: Количество
-    """
-    if count == 0:
-        return 0
-    return int((HUNDRED * Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_UP))
-
-
 PERCENT_TOTAL = 100
 
 
@@ -232,7 +205,7 @@ def update_goal_statistics_averages(statistics: GoalStatistics) -> None:
     statistics['goals_scored_avg'] = calc_avg(statistics['goals_scored'], count_matches)
     statistics['goals_conceded_avg'] = calc_avg(statistics['goals_conceded'], count_matches)
     statistics['goals_total_avg'] = float(
-        Decimal(statistics['goals_scored_avg']) + Decimal(statistics['goals_conceded_avg'])
+        Decimal(statistics['goals_scored_avg']) + Decimal(statistics['goals_conceded_avg']),
     )
 
     if statistics['win'] == 0 and statistics['draw'] == 0 and statistics['defeat'] == 0:
