@@ -183,7 +183,7 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: AsyncSession
     for detail in match_details:
         match_statistic = create_match_statistics(match_statistics, match_details, detail)
         match_rating = calc_rating(match_ratings, detail)
-        match_chance = create_team_chances(match_forecasts, match_statistic, match_rating, detail)
+        match_chance = create_team_chances(match_forecasts, match_statistic, match_rating)
 
         game_date_str = detail['game_date'].strftime('%d.%m.%Y') if detail['game_date'] else ' ' * 10
         score_str = f' {detail['home_score']}:{detail['away_score']}' if detail['home_score'] is not None else ''

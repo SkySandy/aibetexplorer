@@ -27,6 +27,12 @@ class ForecastInfo(TypedDict):
     """Прогноз количества голов забитых домашней командой."""
     away_forecast: int
     """Прогноз количества голов забитых командой гостей."""
+    win_prob_rating: int
+    """Вероятность победы с учетом рейтинга."""
+    draw_prob_rating: int
+    """Вероятность ничьи с учетом рейтинга."""
+    defeat_prob_rating: int
+    """Вероятность поражения с учетом рейтинга."""
 
 
 class MatchForecast(TypedDict):
@@ -47,11 +53,13 @@ class MatchForecast(TypedDict):
 
 
 def create_forecast(
-        match_statistic: MatchStatistics,
+    match_statistic: MatchStatistics,
+    match_rating: MatchRating,
 ) -> ForecastInfo:
     """Рассчитывает шансы команд.
 
     :param match_statistic: Список статистических показателей перед матчем
+    :param match_rating: Рейтинги команд перед матчем
     """
     home = match_statistic['home_statistics']['home']
     away = match_statistic['away_statistics']['away']
@@ -100,6 +108,10 @@ def create_forecast(
     else:
         goals_forecast = defeat
 
+    win_prob_rating = (win['percent'] + match_rating['win_prob']) / 2
+    draw_prob_rating = (draw['percent'] + match_rating['draw_prob']) / 2
+    defeat_prob_rating = (defeat['percent'] + match_rating['defeat_prob']) /2
+
     fi: ForecastInfo = {
         'win_prob': win['percent'],
         'draw_prob': draw['percent'],
@@ -109,6 +121,9 @@ def create_forecast(
         'match_total': goals_forecast['goals_scored_avg'] + goals_forecast['goals_conceded_avg'],
         'home_forecast': goals_forecast['forecast_goals_home'],
         'away_forecast': goals_forecast['forecast_goals_away'],
+        'win_prob_rating': win_prob_rating,
+        'draw_prob_rating': draw_prob_rating,
+        'defeat_prob_rating': defeat_prob_rating,
     }
     return fi
 
@@ -117,7 +132,6 @@ def create_team_chances(
     match_forecasts: list[MatchForecast],
     match_statistic: MatchStatistics,
     match_rating: MatchRating,
-    detail: MatchBetexplorer,
 ) -> MatchForecast:
     """Рассчитывает шансы команд и добавляет в список всех шансов на все матчи.
 
@@ -125,15 +139,14 @@ def create_team_chances(
 
     :param match_forecasts: Список предсказаний результатов матчей
     :param match_statistic: Список статистических показателей перед матчем
-    :param match_rating: Рейтинги команд перед матчами
-    :param detail: Информация о матче
+    :param match_rating: Рейтинги команд перед матчем
     """
-    if detail['match_id'] == 1627199:
+    if match_statistic['match_id'] == 1627190:
         pass
-    forecast = create_forecast(match_statistic)
+    forecast = create_forecast(match_statistic, match_rating)
 
     m_f: MatchForecast = {
-        'match_id': detail['match_id'],
+        'match_id': match_statistic['match_id'],
         'forecast': forecast,
         'forecast_rating': None,
         'forecast_all': None,
