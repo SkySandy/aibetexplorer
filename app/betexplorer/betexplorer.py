@@ -155,7 +155,7 @@ CSS_COUNTRIES_ITEMS: Final[str] = 'div.list-events__item__in'
 CSS_CHAMPIONSHIPS_ITEMS: Final[str] = 'tbody'
 CSS_STAGES_ITEMS: Final[str] = 'ul.list-tabs.list-tabs--secondary'
 CSS_STAGES_SHORT_ITEMS: Final[str] = 'ul.list-tabs.list-tabs--secondary.list-tabs--short'
-CSS_SCORE_HALVES_ITEMS: Final[str] = 'h2.list-details__item__partial'
+CSS_SCORE_HALVES_ITEMS: Final[str] = '.list-details__item__partial'
 
 JAVASCRIPT_VOID = 'javascript:void(0);'
 
@@ -1057,6 +1057,7 @@ async def get_championships(
         database: Optional[str],
         config_engine: Optional[dict],
         load_net: bool,
+        load_detail: bool,
         save_database: DatabaseUsage,
         sport_id: SportType,
         country: CountryBetexplorer,
@@ -1070,6 +1071,7 @@ async def get_championships(
     :param database: Путь к базе данных
     :param config_engine: Конфигурация движка базы данных
     :param load_net: Загрузка данных из интернета False - нет (использовать только сохраненные на диске), True - да
+    :param load_detail: Загружать подробную информацию о матче (таймы, игроки) с сайта
     :param save_database: Операции с базой данных 0 - без операций, 1 - только читать, 2 - читать и записывать
     :param sport_id: Вид спорта
     :param country: Информация о стране
@@ -1105,15 +1107,16 @@ async def get_championships(
                         ls,
                         championship['championship_url'], sport_id,
                         championship['championship_id'], need_refresh)) is not None:
-                    match: MatchBetexplorer
-                    for match in results['matches']:
-                        match_time: Optional[MatchBetexplorer]
-                        if (match_time := await get_match_time(ls, sport_id, championship, match, False)) is not None:
-                            update_match_time(match, match_time)
-                            await get_team(
-                                ls, crd, session,
-                                [match['home_team'], match['away_team']], fast_country, fast_team)
-                            await get_match_line(ls, sport_id, championship, match, False)
+                    if load_detail:
+                        match: MatchBetexplorer
+                        for match in results['matches']:
+                            match_time: Optional[MatchBetexplorer]
+                            if (match_time := await get_match_time(ls, sport_id, championship, match, need_refresh)) is not None:
+                                update_match_time(match, match_time)
+                                await get_team(
+                                    ls, crd, session,
+                                    [match['home_team'], match['away_team']], fast_country, fast_team)
+                                await get_match_line(ls, sport_id, championship, match, False)
                     if save_database != DATABASE_NOT_USE:
                         async with session.begin():
                             await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
@@ -1141,6 +1144,7 @@ async def load_data(
         database: Optional[str] = None,
         sport_type: Optional[list[SportType]] = None,
         load_net: bool = False,
+        load_detail: bool = False,
         save_database: DatabaseUsage = DATABASE_NOT_USE,
         create_tables: int = 0,
         config_engine: Optional[dict] = None,
@@ -1153,6 +1157,7 @@ async def load_data(
     :param database: Путь к базе данных
     :param sport_type: Виды спорта для загрузки
     :param load_net: Загрузка данных из интернета False - нет (использовать только сохраненные на диске), True - да
+    :param load_detail: Загружать подробную информацию о матче (таймы, игроки) с сайта
     :param save_database: Операции с базой данных 0 - без операций, 1 - только читать, 2 - читать и записывать
     :param create_tables: Создание базы данных если не существует 0 -не создавать, 1 - создать
     :param config_engine: Выводить команды SQL отправляемые на сервер
@@ -1200,13 +1205,13 @@ async def load_data(
                 for country in list(filter(lambda x: x['country_name'] not in exclude_countries, countries)):
                     if processes == 1:
                         await get_championships(
-                            root_dir, database, config_engine, load_net, save_database,
+                            root_dir, database, config_engine, load_net, load_detail, save_database,
                             sport_id, country, updated_years, fast_country, lock
                         )
                     else:
                         futures.append(loop.run_in_executor(  # noqa: PERF401
                             pool, wrapper, get_championships,
-                            root_dir, database, config_engine, load_net, save_database,
+                            root_dir, database, config_engine, load_net, load_detail, save_database,
                             sport_id, country, updated_years, fast_country, lock)  # noqa: COM812
                         )
     if futures:

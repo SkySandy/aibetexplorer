@@ -23,6 +23,7 @@ async def load() -> None:
         database=settings.SQLALCHEMY_DATABASE_URI,
         sport_type=settings.SPORT_TYPE,
         load_net=settings.LOAD_NET,
+        load_detail=settings.LOAD_DETAIL,
         save_database=settings.SAVE_DATABASE,
         create_tables=settings.CREATE_TABLES,
         config_engine=settings.CONFIG_DATABASE,

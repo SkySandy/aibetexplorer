@@ -3,8 +3,11 @@ import asyncio
 from contextlib import nullcontext
 import datetime
 from email.utils import parsedate_to_datetime
+import inspect
 import multiprocessing
 import os
+import sys
+import traceback
 from typing import TYPE_CHECKING, Callable, NamedTuple, Optional, Union
 from urllib.parse import parse_qsl, urljoin, urlparse
 
@@ -22,6 +25,20 @@ from selectolax.parser import HTMLParser, Node
 
 from app.betexplorer.crud import DATABASE_NOT_USE, DatabaseUsage
 from app.database import DatabaseSessionManager
+
+
+def get_current_depth() -> int:
+    """Ручной подсчет фреймов."""
+    frame = sys._getframe()
+    depth = 0
+    while frame:
+        frame = frame.f_back
+        depth += 1
+    return depth
+
+def get_current_depth2() -> int:
+    """Ручной подсчет фреймов."""
+    return len(inspect.stack())
 
 
 class ReceivedData(NamedTuple):
@@ -140,6 +157,16 @@ class LoadSave():
                     print(datetime.datetime.now(), flush=True)
                     print(url, flush=True)
                     print(ex, flush=True)
+                    await asyncio.sleep(delay)
+                    delay *= 2
+                    retries += 1
+                except RecursionError as ex:
+                    print(datetime.datetime.now(), flush=True)
+                    print(url, flush=True)
+                    print(ex, flush=True)
+                    print(traceback.format_exc())
+                    print(f'Текущая глубина: {get_current_depth()}')
+                    print(f'Текущая глубина2: {get_current_depth2()}')
                     await asyncio.sleep(delay)
                     delay *= 2
                     retries += 1

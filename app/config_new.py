@@ -55,6 +55,9 @@ class Settings:
     LOAD_NET: bool = False
     """Загружать данные с сайта."""
 
+    LOAD_DETAIL: bool = True
+    """Загружать подробную информацию о матче (таймы, игроки) с сайта."""
+
     # SAVE_DATABASE: DatabaseUsage = DATABASE_NOT_USE
     SAVE_DATABASE: DatabaseUsage = DATABASE_WRITE_DATA
     """Не использовать базу данных, читать, записывать данные в базу данных."""
