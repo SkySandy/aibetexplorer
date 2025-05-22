@@ -1058,6 +1058,7 @@ async def get_championships(
         config_engine: Optional[dict],
         load_net: bool,
         load_detail: bool,
+        load_detail_coefficients: bool,
         save_database: DatabaseUsage,
         sport_id: SportType,
         country: CountryBetexplorer,
@@ -1072,6 +1073,7 @@ async def get_championships(
     :param config_engine: Конфигурация движка базы данных
     :param load_net: Загрузка данных из интернета False - нет (использовать только сохраненные на диске), True - да
     :param load_detail: Загружать подробную информацию о матче (таймы, игроки) с сайта
+    :param load_detail_coefficients: Загружать подробную информацию о коэффициентах (тотал, фора)
     :param save_database: Операции с базой данных 0 - без операций, 1 - только читать, 2 - читать и записывать
     :param sport_id: Вид спорта
     :param country: Информация о стране
@@ -1102,7 +1104,7 @@ async def get_championships(
             for championship in championships:
                 need_refresh: bool = any(year in championship['championship_years'] for year in updated_years)
 
-                results: Optional[ResultsBetexplorer]
+                results: ResultsBetexplorer | None
                 if (results := await get_results_fixtures(
                         ls,
                         championship['championship_url'], sport_id,
@@ -1110,13 +1112,14 @@ async def get_championships(
                     if load_detail:
                         match: MatchBetexplorer
                         for match in results['matches']:
-                            match_time: Optional[MatchBetexplorer]
+                            match_time: MatchBetexplorer | None
                             if (match_time := await get_match_time(ls, sport_id, championship, match, need_refresh)) is not None:
                                 update_match_time(match, match_time)
                                 await get_team(
                                     ls, crd, session,
                                     [match['home_team'], match['away_team']], fast_country, fast_team)
-                                await get_match_line(ls, sport_id, championship, match, False)
+                                if load_detail_coefficients:
+                                    await get_match_line(ls, sport_id, championship, match, False)
                     if save_database != DATABASE_NOT_USE:
                         async with session.begin():
                             await crd.add_championship_stages(session, championship['championship_id'], results['stages'])
@@ -1141,15 +1144,16 @@ def register_signal_handler() -> None:
 
 async def load_data(
         root_dir: str,
-        database: Optional[str] = None,
+        database: str | None = None,
         sport_type: Optional[list[SportType]] = None,
         load_net: bool = False,
         load_detail: bool = False,
+        load_detail_coefficients: bool = False,
         save_database: DatabaseUsage = DATABASE_NOT_USE,
         create_tables: int = 0,
-        config_engine: Optional[dict] = None,
-        start_updating: Optional[datetime.datetime] = None,
-        exclude_countries: Optional[tuple] = None,
+        config_engine: dict | None = None,
+        start_updating: datetime.datetime | None = None,
+        exclude_countries: Optional[tuple] = None,  # noqa: UP007
         processes: int = 1) -> None:
     """Первоначальная Загрузка данных спортивных состязаний всех чемпионатов во всех странах.
 
@@ -1158,6 +1162,7 @@ async def load_data(
     :param sport_type: Виды спорта для загрузки
     :param load_net: Загрузка данных из интернета False - нет (использовать только сохраненные на диске), True - да
     :param load_detail: Загружать подробную информацию о матче (таймы, игроки) с сайта
+    :param load_detail_coefficients: Загружать подробную информацию о коэффициентах (тотал, фора)
     :param save_database: Операции с базой данных 0 - без операций, 1 - только читать, 2 - читать и записывать
     :param create_tables: Создание базы данных если не существует 0 -не создавать, 1 - создать
     :param config_engine: Выводить команды SQL отправляемые на сервер
@@ -1205,14 +1210,14 @@ async def load_data(
                 for country in list(filter(lambda x: x['country_name'] not in exclude_countries, countries)):
                     if processes == 1:
                         await get_championships(
-                            root_dir, database, config_engine, load_net, load_detail, save_database,
-                            sport_id, country, updated_years, fast_country, lock
+                            root_dir, database, config_engine, load_net, load_detail, load_detail_coefficients,
+                            save_database, sport_id, country, updated_years, fast_country, lock
                         )
                     else:
-                        futures.append(loop.run_in_executor(  # noqa: PERF401
+                        futures.append(loop.run_in_executor(
                             pool, wrapper, get_championships,
-                            root_dir, database, config_engine, load_net, load_detail, save_database,
-                            sport_id, country, updated_years, fast_country, lock)  # noqa: COM812
+                            root_dir, database, config_engine, load_net, load_detail, load_detail_coefficients,
+                            save_database, sport_id, country, updated_years, fast_country, lock)  # noqa: COM812
                         )
     if futures:
         await asyncio.wait(futures)

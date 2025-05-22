@@ -58,6 +58,9 @@ class Settings:
     LOAD_DETAIL: bool = True
     """Загружать подробную информацию о матче (таймы, игроки) с сайта."""
 
+    LOAD_DETAIL_COEFFICIENTS: bool = False
+    """Загружать подробную информацию о коэффициентах (тотал, фора)."""
+
     # SAVE_DATABASE: DatabaseUsage = DATABASE_NOT_USE
     SAVE_DATABASE: DatabaseUsage = DATABASE_WRITE_DATA
     """Не использовать базу данных, читать, записывать данные в базу данных."""

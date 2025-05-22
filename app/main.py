@@ -24,6 +24,7 @@ async def load() -> None:
         sport_type=settings.SPORT_TYPE,
         load_net=settings.LOAD_NET,
         load_detail=settings.LOAD_DETAIL,
+        load_detail_coefficients=settings.LOAD_DETAIL_COEFFICIENTS,
         save_database=settings.SAVE_DATABASE,
         create_tables=settings.CREATE_TABLES,
         config_engine=settings.CONFIG_DATABASE,
