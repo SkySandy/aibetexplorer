@@ -811,7 +811,7 @@ class CRUDbetexplorer:
                         ),
                     ),
                 )
-                .join(Country, Team.country_id == Country.country_id)
+                .outerjoin(Country, Team.country_id == Country.country_id)
                 .where(Team.team_id == Match.home_team_id)
                 .scalar_subquery()
                 .label('home_team'),
@@ -832,7 +832,7 @@ class CRUDbetexplorer:
                         ),
                     ),
                 )
-                .join(Country, Team.country_id == Country.country_id)
+                .outerjoin(Country, Team.country_id == Country.country_id)
                 .where(Team.team_id == Match.away_team_id)
                 .scalar_subquery()
                 .label('away_team'),

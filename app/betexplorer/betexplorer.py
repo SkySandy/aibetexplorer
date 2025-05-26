@@ -918,7 +918,7 @@ async def get_match_time(
         championship: ChampionshipBetexplorer,
         match: MatchBetexplorer,
         need_refresh: bool,  # noqa: FBT001
-) -> Optional[MatchBetexplorer]:
+) -> MatchBetexplorer | None:
     """Загрузка и разбор информации по тайм-матч.
 
     :param ls: Класс для загрузки данных
@@ -928,12 +928,15 @@ async def get_match_time(
     :param need_refresh: Необходимо обновить данные
     """
     if match['match_url'] is not None:
-        load_match: Optional[ReceivedData]
+        load_match: ReceivedData | None
         if (load_match := await ls.get_read(match['match_url'], CSS_MATCH, need_refresh)) is not None:
-            match_time: Optional[MatchBetexplorer] = parsing_match_time(
+            match_time: MatchBetexplorer | None = parsing_match_time(
                 load_match, sport_id, championship['championship_id'], match['stage_name'],
                 match['round_name'], match['round_number'], match['is_fixture'])
-            if need_refresh and match_time['game_date'] + datetime.timedelta(days=1) > match_time['download_date']:
+            if ((not need_refresh)
+                    and ((match['game_date'] + datetime.timedelta(days=2)) > match_time['download_date'])
+                    and ((match['game_date'] - datetime.timedelta(days=14)) < datetime.datetime.now())
+            ):
                 return await get_match_time(ls, sport_id, championship, match, True)  # noqa: FBT003
             return match_time
     return None
@@ -1113,13 +1116,13 @@ async def get_championships(
                         match: MatchBetexplorer
                         for match in results['matches']:
                             match_time: MatchBetexplorer | None
-                            if (match_time := await get_match_time(ls, sport_id, championship, match, need_refresh)) is not None:
+                            if (match_time := await get_match_time(ls, sport_id, championship, match, False)) is not None:
                                 update_match_time(match, match_time)
                                 await get_team(
                                     ls, crd, session,
                                     [match['home_team'], match['away_team']], fast_country, fast_team)
                                 if load_detail_coefficients:
-                                    await get_match_line(ls, sport_id, championship, match, False)
+                                    await get_match_line(ls, sport_id, championship, match, need_refresh)
                     if save_database != DATABASE_NOT_USE:
                         async with session.begin():
                             await crd.add_championship_stages(session, championship['championship_id'], results['stages'])

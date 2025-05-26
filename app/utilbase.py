@@ -242,25 +242,25 @@ class LoadSave():
             # ret_node: Optional[Node] = HTMLParser(rrr).css_first(class_)
             if class_ == '':
                 save_text: str = await self.load_file(file_path)
-                ret_node: Optional[Node] = HTMLParser(save_text)
+                ret_node: Node | None = HTMLParser(save_text)
             else:
-                ret_node: Optional[Node] = HTMLParser(await self.load_file(file_path)).css_first(class_)
+                ret_node: Node | None = HTMLParser(await self.load_file(file_path)).css_first(class_)
             date_file: datetime.datetime = datetime.datetime.fromtimestamp(await aiofiles_os.path.getmtime(file_path))
             if (ret_node is None) and (class_ != ''):
                 print(f'{datetime.datetime.now()} Not found: url = {url} class_= {class_}', flush=True)
                 return None
             return ReceivedData(ret_node, date_file)
         if self.load_net:
-            ret: Optional[HTMLData]
+            ret: HTMLData | None
             if (ret := await self.get_file_bet(urljoin(self.root_url, url))) is not None:
                 save_text: str = ret.text
-                ret_node: Optional[Node] = None
+                ret_node: Node | None = None
                 if class_ == '':
                     save_text = save_text.replace('\\n', '\r\n')
                     save_text = save_text.replace('\\"', '"')
                     save_text = save_text.replace('\\/', '/')
                     save_text = save_text[9:-2]
-                    ret_node: Optional[Node] = HTMLParser(save_text)
+                    ret_node: Node | None = HTMLParser(save_text)
                     for node in ret_node.css('a[onclick]'):
                         if node.attrs['onclick'][:14] == 'dataLayer.push':
                             del node.attrs['onclick']

@@ -4,7 +4,7 @@ import os
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage
+from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage, DATABASE_WRITE_DATA
 from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
 from app.fbcup.forecast import MatchForecast, create_team_chances
@@ -266,10 +266,10 @@ async def to_fbcup(
     :param processes: Одновременное количество запущенных процессов
     """
     db = DatabaseSessionManager()
-    if save_database != DATABASE_NOT_USE:
-        db.init(database, **config_engine)
+    save_database = DATABASE_WRITE_DATA
+    db.init(database, **config_engine)
     crd: CRUDbetexplorer = CRUDbetexplorer(save_database=save_database)
 
     async with db.get_session() as session:
-        await save_championship(crd, session, root_dir, 10818)
+        await save_championship(crd, session, root_dir, 5208)
     await db.close()

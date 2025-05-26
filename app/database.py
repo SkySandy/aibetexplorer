@@ -44,9 +44,9 @@ class DatabaseSessionManager:
 
     def __init__(self) -> None:
         """Инициализация класса для загрузки данных."""
-        self._engine: Optional[AsyncEngine] = None
-        self._sessionmaker: Optional[async_sessionmaker[AsyncSession]] = None
-        self._scoped_factory: Optional[async_scoped_session[AsyncSession]] = None
+        self._engine: AsyncEngine | None = None
+        self._sessionmaker: async_sessionmaker[AsyncSession] | None = None
+        self._scoped_factory: async_scoped_session[AsyncSession] | None = None
 
     def init(self, url: str, **config_engine: Any) -> None:
         """Создаем движок.
