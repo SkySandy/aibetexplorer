@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.betexplorer.crud import DATABASE_NOT_USE, CRUDbetexplorer, DatabaseUsage, DATABASE_WRITE_DATA
 from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplorer
 from app.database import DatabaseSessionManager
+from app.fbcup.bet import MatchBet
 from app.fbcup.forecast import MatchForecast, create_team_chances
-from app.fbcup.forecast_summary import calc_forecast_summary
-from app.fbcup.statistic import MatchStatistics, create_match_statistics
+from app.fbcup.statistic import MatchStatistics, calculate_league_prematch_stats
 from app.fbcup.rating import MatchRating, calc_rating
 from app.fbcup.utils import odds_to_prob, calc_margin, calc_prob, calc_double_odds
 from app.utils import save_list
@@ -176,12 +176,16 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: AsyncSession
     # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
     #     session, championship_id)
     match_ratings: list[MatchRating] = []
-    match_statistics: list[MatchStatistics] = []
+    match_statistics: dict[int, MatchStatistics] = {}
+    """Статистика перед матчем для домашней и гостевой команды"""
+    calculate_league_prematch_stats(match_statistics, match_details)
+
     match_forecasts: list[MatchForecast] = []
+    match_bets: list[MatchBet] = []
     match_strings: list[str] = []
     match_strings_forecast: list[str] = []
     for detail in match_details:
-        match_statistic = create_match_statistics(match_statistics, match_details, detail)
+        match_statistic = match_statistics[detail['match_id']]
         match_rating = calc_rating(match_ratings, detail)
         match_chance = create_team_chances(match_forecasts, match_statistic, match_rating)
 
@@ -237,7 +241,6 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: AsyncSession
         match_strings_forecast.append(match_chance_str)
 
     match_strings.append('[END]')
-    f_s = calc_forecast_summary(match_details, match_forecasts)
     return match_strings
 
 
@@ -271,5 +274,5 @@ async def to_fbcup(
     crd: CRUDbetexplorer = CRUDbetexplorer(save_database=save_database)
 
     async with db.get_session() as session:
-        await save_championship(crd, session, root_dir, 5208)
+        await save_championship(crd, session, root_dir, 11202)
     await db.close()

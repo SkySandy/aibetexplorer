@@ -795,6 +795,7 @@ class CRUDbetexplorer:
                 Match.match_id,
                 Match.championship_id,
                 Match.match_url,
+                Match.home_team_id,
                 select(
                     func.to_json(
                         func.json_build_object(
@@ -816,6 +817,7 @@ class CRUDbetexplorer:
                 .scalar_subquery()
                 .label('home_team'),
                 Match.home_team_emblem,
+                Match.away_team_id,
                 select(
                     func.to_json(
                         func.json_build_object(
@@ -846,6 +848,7 @@ class CRUDbetexplorer:
                 Match.score_stage,
                 Match.score_stage_short,
                 Match.stage_name,
+                Match.round_number,
                 select(
                     func.json_agg(aggregate_order_by(
                         func.json_build_object(

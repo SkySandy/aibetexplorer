@@ -217,10 +217,14 @@ class MatchBetexplorer(TypedDict):
     """Идентификатор чемпионата."""
     match_url: str
     """Ссылка на матч."""
+    home_team_id: int
+    """Идентификатор домашней команды."""
     home_team: TeamBetexplorer
     """Домашняя команда."""
     home_team_emblem: Optional[str]
     """"Эмблема домашней команды."""
+    away_team_id: int
+    """Идентификатор команды гостей."""
     away_team: TeamBetexplorer
     """Команда гостей."""
     away_team_emblem: Optional[str]
