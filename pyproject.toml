@@ -44,7 +44,7 @@ src = ["app"]
 # McCabe complexity (`C901`) by default.
 select = ["E1", "E2", "E3", "E4", "E5", "E7", "E9", "W", "F", "C90", "B", "Q", "I", "RUF", "N", "D", "YTT", "ANN", "ASYNC", "ASYNC1", "S", "BLE", "FBT", "A", "COM", "C4", "DTZ", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "PYI", "PT", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "TD", "FIX", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "T10", "EM", "T20", "TC", "PERF", "E", "DOC", "UP"]
 ignore = ["D203", "D213", "D107", "ANN401", "DOC201", "FURB113"]
-allowed-confusables = ["−", "ρ", "∗", "о", "с", "б", "н", "Н", "е", "а", "В", "г"]
+allowed-confusables = ["−", "ρ", "∗", "о", "с", "б", "н", "Н", "е", "а", "В", "г", "р", "у"]
 
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
