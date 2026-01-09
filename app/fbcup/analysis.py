@@ -25,21 +25,7 @@ async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | No
     """
     calc_params: AnalysConfig = AnalysConfig()
     result_bet = []
-    # countries: list[CountryBetexplorer] = await crd.get_countries_by_sport(session, SportType.FOOTBALL)
     match_details: list[MatchBetexplorer] = await crd.get_matches_by_sport(session, championship_id)
-
-    # params = {"match_statistics": {},
-    #           "match_details": match_details,
-    #           }
-    # results3 = timeit.repeat(
-    #     stmt='calculate_league_prematch_stats(match_statistics, match_details)',
-    #     setup='from statistic import calculate_league_prematch_stats',
-    #     globals=params,
-    #     number=100,  # Вызовов за один замер
-    #     repeat=5,  # Количество замеров
-    # )
-    # print(results3)
-
     match_statistics: dict[int, MatchStatistics] = calculate_league_prematch_stats(match_details)
     """Статистика перед матчем для домашней и гостевой команды"""
 
