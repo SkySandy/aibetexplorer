@@ -196,7 +196,6 @@ def calculate_match_rating(
 
     :return: Рассчитанный рейтинг матча
     """
-    # Валидация входных данных
     home_team_id = detail['home_team']['team_id']
     away_team_id = detail['away_team']['team_id']
 
@@ -235,6 +234,8 @@ def calculate_match_rating(
 
 def calc_rating(match_ratings: list[MatchRating], detail: MatchBetexplorer) -> MatchRating:
     """Рассчитывает рейтинги команд для матча и добавляет их в список рейтингов.
+
+    Функция имеет побочный эффект - добавляет рассчитанный рейтинг в список match_ratings.
 
     :param match_ratings: Список рейтингов матчей (должны быть отсортированы в хронологическом порядке)
     :param detail: Информация о матче
