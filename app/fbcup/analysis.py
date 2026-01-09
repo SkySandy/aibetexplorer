@@ -53,10 +53,10 @@ async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | No
 
 async def one_championship_matches(match_details: list[MatchBetexplorer], match_statistics: dict[int, MatchStatistics],
                                    calc_params: AnalysConfig) -> BetSummary:
-    """Выводит на экран информацию о матчах указанного чемпионата.
+    """Выполняет полный цикл анализа статистики всех матчей чемпионата для расчета ставок.
 
     :param match_details: Все матчи чемпионата
-    :param match_statistics: Статистика на матч
+    :param match_statistics: Предматчевая статистика для каждого матча
     :param calc_params: Параметры для расчета ставок
     """
     match_ratings: list[MatchRating] = []

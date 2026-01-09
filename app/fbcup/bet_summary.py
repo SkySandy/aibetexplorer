@@ -42,10 +42,10 @@ def calc_bet_summary(
         match_bets: list[MatchBet],
         calc_params: AnalysConfig,
 ) -> BetSummary:
-    """Рассчитать итого прогнозирования матчей.
+    """Оценка финансовой эффективности стратегии ставок.
 
     :param match_details: Список результатов матчей
-    :param match_bets: Список ставок на матч
+    :param match_bets: Список ставок на матчи
     :param calc_params: Параметры для расчета ставок
     """
     bets_map = {f.match_id: f for f in match_bets}
