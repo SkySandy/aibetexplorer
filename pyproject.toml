@@ -1,3 +1,21 @@
+[project]
+name = "aibetexplorer"
+version = "0.1.0"
+dependencies = [
+    "aiosqlite",
+    "aiofiles",
+    "aiohttp",
+    "asyncpg",
+    "psycopg2",
+    "deepdiff",
+    "pytest",
+    "pytest-asyncio",
+    "pytest-mock",
+    "selectolax",
+    "SQLAlchemy",
+    "ruff",
+]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
