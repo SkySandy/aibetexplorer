@@ -5,6 +5,7 @@ from typing import TypedDict
 
 from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.forecast import MatchForecast
+from app.fbcup.statistic import MatchId
 
 
 class HistoryKellyStake(TypedDict):
@@ -89,7 +90,7 @@ class BookmakerBet(TypedDict):
 class MatchBet:
     """Ставки на матч на основе разных алгоритмов."""
 
-    match_id: int
+    match_id: MatchId
     """Идентификатор матча."""
     forecast: BookmakerBet | None
     """"Прогноз."""

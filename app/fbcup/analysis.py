@@ -1,19 +1,19 @@
 """Анализ ставок при различных параметрах."""
 import datetime
-import timeit
 
-from analys_config import AnalysConfig
-from bet import MatchBet, create_bet
-from bet_summary import BetSummary, calc_bet_summary
-from crud import DATABASE_NOT_USE, DATABASE_WRITE_DATA, CRUDbetexplorer, DatabaseUsage
-from forecast import MatchForecast, create_team_chances
-from forecast_summary import calc_forecast_summary
-from rating import MatchRating, calc_rating
-from schemas import MatchBetexplorer, SportType
 from sqlalchemy.ext.asyncio import AsyncSession
-from statistic import MatchStatistics, calculate_league_prematch_stats
 
-from database import DatabaseSessionManager
+from app.betexplorer.crud import DATABASE_NOT_USE, DATABASE_WRITE_DATA, CRUDbetexplorer, DatabaseUsage
+from app.betexplorer.schemas import MatchBetexplorer, SportType
+from app.database import DatabaseSessionManager
+from app.fbcup.analys_config import AnalysConfig
+from app.fbcup.bet import MatchBet, create_bet
+from app.fbcup.bet_summary import BetSummary, calc_bet_summary
+from app.fbcup.forecast import MatchForecast, create_team_chances
+from app.fbcup.forecast_summary import calc_forecast_summary
+from app.fbcup.rating import MatchRating, calc_rating
+from app.fbcup.statistic import MatchId, MatchStatistics, calculate_league_prematch_stats
+
 
 async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | None,
                                 root_dir: str, championship_id: int) -> None:
@@ -26,7 +26,7 @@ async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | No
     calc_params: AnalysConfig = AnalysConfig()
     result_bet = []
     match_details: list[MatchBetexplorer] = await crd.get_matches_by_sport(session, championship_id)
-    match_statistics: dict[int, MatchStatistics] = calculate_league_prematch_stats(match_details)
+    match_statistics: dict[MatchId, MatchStatistics] = calculate_league_prematch_stats(match_details)
     """Статистика перед матчем для домашней и гостевой команды"""
 
     for round_number in range(1, 32):
@@ -36,7 +36,8 @@ async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | No
     pass
 
 
-async def one_championship_matches(match_details: list[MatchBetexplorer], match_statistics: dict[int, MatchStatistics],
+async def one_championship_matches(match_details: list[MatchBetexplorer],
+                                   match_statistics: dict[MatchId, MatchStatistics],
                                    calc_params: AnalysConfig) -> BetSummary:
     """Выполняет полный цикл анализа статистики всех матчей чемпионата для расчета ставок.
 

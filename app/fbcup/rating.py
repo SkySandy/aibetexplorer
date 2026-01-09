@@ -3,12 +3,13 @@
 from typing import TypedDict
 
 from app.betexplorer.schemas import MatchBetexplorer
+from app.fbcup.statistic import MatchId
 
 
 class MatchRating(TypedDict):
     """Рейтинги команд на матч."""
 
-    match_id: int
+    match_id: MatchId
     """Идентификатор матча."""
     home_team_id: int | None
     """"Идентификатор домашней команды."""

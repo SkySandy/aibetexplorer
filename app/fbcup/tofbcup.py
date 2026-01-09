@@ -9,7 +9,7 @@ from app.betexplorer.schemas import SportType, CountryBetexplorer, MatchBetexplo
 from app.database import DatabaseSessionManager
 from app.fbcup.bet import MatchBet
 from app.fbcup.forecast import MatchForecast, create_team_chances
-from app.fbcup.statistic import MatchStatistics, calculate_league_prematch_stats
+from app.fbcup.statistic import MatchId, MatchStatistics, calculate_league_prematch_stats
 from app.fbcup.rating import MatchRating, calc_rating
 from app.fbcup.utils import odds_to_prob, calc_margin, calc_prob, calc_double_odds
 from app.utils import save_list
@@ -176,7 +176,7 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: AsyncSession
     # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
     #     session, championship_id)
     match_ratings: list[MatchRating] = []
-    match_statistics: dict[int, MatchStatistics] = calculate_league_prematch_stats(match_details)
+    match_statistics: dict[MatchId, MatchStatistics] = calculate_league_prematch_stats(match_details)
     """Статистика перед матчем для домашней и гостевой команды"""
 
     match_forecasts: list[MatchForecast] = []

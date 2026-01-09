@@ -7,6 +7,9 @@ from decimal import Decimal
 from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.utils import calc_avg, calc_avg_percent
 
+type MatchId = int
+"""Тип для идентификатора матча."""
+
 
 @dataclass
 class GoalStatistics:
@@ -78,7 +81,7 @@ class FieldTypeTotals:
 class MatchStatistics:
     """Статистика перед матчем для домашней и гостевой команды."""
 
-    match_id: int
+    match_id: MatchId
     """Идентификатор матча."""
     home_prematch: FieldTypeTotals
     """"Статистика для домашней команды перед матчем."""
@@ -166,7 +169,7 @@ def _update_team_stat(team_stats: FieldTypeTotals, match_info: MatchBetexplorer,
 
 def calculate_league_prematch_stats(
         championship_matches: list[MatchBetexplorer],
-) -> dict[int, MatchStatistics]:
+) -> dict[MatchId, MatchStatistics]:
     """Рассчитывает предматчевую статистику для всех матчей чемпионата.
 
     :param championship_matches: Список матчей чемпионата (должны быть отсортированы в хронологическом порядке)
@@ -174,7 +177,7 @@ def calculate_league_prematch_stats(
     """
     # Инициализация хранилища статистики для команд
     team_stats: dict[int, FieldTypeTotals] = defaultdict(FieldTypeTotals)
-    match_statistics: dict[int, MatchStatistics] = {}
+    match_statistics: dict[MatchId, MatchStatistics] = {}
 
     for match_detail in championship_matches:
         # Извлекаем идентификаторы команд
@@ -182,7 +185,7 @@ def calculate_league_prematch_stats(
         away_team_id: int = match_detail['away_team_id']
 
         # Сохраняем статистику для текущего матча
-        match_id: int = match_detail['match_id']
+        match_id: MatchId = match_detail['match_id']
         match_statistics[match_id] = MatchStatistics(
             match_id=match_id,
             home_prematch=deepcopy(team_stats[home_team_id]),
@@ -195,5 +198,5 @@ def calculate_league_prematch_stats(
         # Обновляем статистику команд после матча
         _update_team_stat(team_stats[home_team_id], match_detail, is_home=True)
         _update_team_stat(team_stats[away_team_id], match_detail, is_home=False)
-    
+
     return match_statistics

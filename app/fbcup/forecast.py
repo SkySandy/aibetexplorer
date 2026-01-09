@@ -3,7 +3,7 @@
 from typing import TypedDict
 
 from app.fbcup.rating import MatchRating
-from app.fbcup.statistic import MatchStatistics, calc_avg
+from app.fbcup.statistic import MatchId, MatchStatistics, calc_avg
 from app.fbcup.utils import rounds_goal, rounds_whole
 
 
@@ -37,7 +37,7 @@ class ForecastInfo(TypedDict):
 class MatchForecast(TypedDict):
     """Предсказание результатов команд на матч."""
 
-    match_id: int
+    match_id: MatchId
     """Идентификатор матча."""
     forecast: ForecastInfo | None
     """"Прогноз."""
