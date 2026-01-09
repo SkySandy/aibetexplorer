@@ -49,7 +49,7 @@ async def one_championship_matches(match_details: list[MatchBetexplorer],
     match_forecasts: list[MatchForecast] = []
     match_bets: list[MatchBet] = []
     for detail in match_details:
-        match_statistic = match_statistics[detail['match_id']]
+        match_statistic: MatchStatistics = match_statistics[detail['match_id']]
         match_rating = calc_rating(match_ratings, detail)
         match_chance = create_team_chances(match_forecasts, match_statistic, match_rating)
         match_bet = create_bet(match_bets, detail, match_chance)
