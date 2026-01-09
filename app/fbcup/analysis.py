@@ -40,9 +40,8 @@ async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | No
     # )
     # print(results3)
 
-    match_statistics: dict[int, MatchStatistics] = {}
+    match_statistics: dict[int, MatchStatistics] = calculate_league_prematch_stats(match_details)
     """Статистика перед матчем для домашней и гостевой команды"""
-    calculate_league_prematch_stats(match_statistics, match_details)
 
     for round_number in range(1, 32):
         calc_params.round_number = round_number

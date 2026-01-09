@@ -165,18 +165,16 @@ def _update_team_stat(team_stats: FieldTypeTotals, match_info: MatchBetexplorer,
 
 
 def calculate_league_prematch_stats(
-        match_statistics: dict[int, MatchStatistics],
         championship_matches: list[MatchBetexplorer],
-) -> None:
+) -> dict[int, MatchStatistics]:
     """Рассчитывает предматчевую статистику для всех матчей чемпионата.
 
-    Мутирует входной словарь `match_statistics`, добавляя в него новый элемент.
-
-    :param match_statistics: Словарь статистических показателей перед матчами
     :param championship_matches: Список матчей чемпионата (должны быть отсортированы в хронологическом порядке)
+    :return: Словарь статистических показателей перед матчами, где ключ - match_id
     """
     # Инициализация хранилища статистики для команд
     team_stats: dict[int, FieldTypeTotals] = defaultdict(FieldTypeTotals)
+    match_statistics: dict[int, MatchStatistics] = {}
 
     for match_detail in championship_matches:
         # Извлекаем идентификаторы команд
@@ -197,3 +195,5 @@ def calculate_league_prematch_stats(
         # Обновляем статистику команд после матча
         _update_team_stat(team_stats[home_team_id], match_detail, is_home=True)
         _update_team_stat(team_stats[away_team_id], match_detail, is_home=False)
+    
+    return match_statistics

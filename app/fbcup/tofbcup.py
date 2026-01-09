@@ -176,9 +176,8 @@ async def print_championship_matches(crd: CRUDbetexplorer, session: AsyncSession
     # match_details: list[CRUDbetexplorer.ChampionshipMatchResult] = await crd.championship_matches(
     #     session, championship_id)
     match_ratings: list[MatchRating] = []
-    match_statistics: dict[int, MatchStatistics] = {}
+    match_statistics: dict[int, MatchStatistics] = calculate_league_prematch_stats(match_details)
     """Статистика перед матчем для домашней и гостевой команды"""
-    calculate_league_prematch_stats(match_statistics, match_details)
 
     match_forecasts: list[MatchForecast] = []
     match_bets: list[MatchBet] = []
