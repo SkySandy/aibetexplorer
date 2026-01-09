@@ -185,28 +185,44 @@ def new_rating(home_team_rating_before: int, away_team_rating_before: int,
     return home_team_rating_after, away_team_rating_after
 
 
-def calc_rating(match_ratings: list[MatchRating], detail: MatchBetexplorer) -> MatchRating:
-    """Рассчитывает рейтинги команд для матча и добавляет их в список рейтингов.
+def calculate_match_rating(
+    match_ratings: list[MatchRating],
+    detail: MatchBetexplorer,
+) -> MatchRating:
+    """Рассчитывает рейтинги команд для матча.
 
     :param match_ratings: Список рейтингов матчей (должны быть отсортированы в хронологическом порядке)
     :param detail: Информация о матче
+
+    :return: Рассчитанный рейтинг матча
     """
-    if detail['match_id'] == 1627190:
-        pass
-    home_team_rating_before: int = old_rating(match_ratings, detail['home_team']['team_id'])
-    away_team_rating_before: int = old_rating(match_ratings, detail['away_team']['team_id'])
+    # Валидация входных данных
+    home_team_id = detail['home_team']['team_id']
+    away_team_id = detail['away_team']['team_id']
+
+    # Получаем рейтинги команд перед матчем
+    home_team_rating_before = old_rating(match_ratings, home_team_id)
+    away_team_rating_before = old_rating(match_ratings, away_team_id)
+
+    # Рассчитываем новые рейтинги после матча
     home_team_rating_after, away_team_rating_after = new_rating(
         home_team_rating_before,
         away_team_rating_before,
         detail['home_score'],
         detail['away_score'],
     )
-    win_prob, draw_prob, defeat_prob = calc_match_probabilities_fbcup(home_team_rating_before, away_team_rating_before)
 
-    match_rating: MatchRating = {
+    # Рассчитываем вероятности исходов матча
+    win_prob, draw_prob, defeat_prob = calc_match_probabilities_fbcup(
+        home_team_rating_before,
+        away_team_rating_before,
+    )
+
+    # Создаем и возвращаем структуру рейтинга матча
+    return {
         'match_id': detail['match_id'],
-        'home_team_id': detail['home_team']['team_id'],
-        'away_team_id': detail['away_team']['team_id'],
+        'home_team_id': home_team_id,
+        'away_team_id': away_team_id,
         'home_team_rating_before': home_team_rating_before,
         'away_team_rating_before': away_team_rating_before,
         'home_team_rating_after': home_team_rating_after,
@@ -215,5 +231,16 @@ def calc_rating(match_ratings: list[MatchRating], detail: MatchBetexplorer) -> M
         'draw_prob': draw_prob,
         'defeat_prob': defeat_prob,
     }
+
+
+def calc_rating(match_ratings: list[MatchRating], detail: MatchBetexplorer) -> MatchRating:
+    """Рассчитывает рейтинги команд для матча и добавляет их в список рейтингов.
+
+    :param match_ratings: Список рейтингов матчей (должны быть отсортированы в хронологическом порядке)
+    :param detail: Информация о матче
+
+    :return: Рассчитанный рейтинг матча
+    """
+    match_rating = calculate_match_rating(match_ratings, detail)
     match_ratings.append(match_rating)
     return match_rating
