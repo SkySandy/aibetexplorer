@@ -126,23 +126,20 @@ def create_forecast(
     }
 
 
-def create_team_chances(
-    match_forecasts: list[MatchForecast],
-    match_statistic: MatchStatistics,
-    match_rating: MatchRating,
-) -> MatchForecast:
+def create_team_chances(match_id: MatchId, match_forecasts: list[MatchForecast], match_statistic: MatchStatistics, match_rating: MatchRating) -> MatchForecast:
     """Рассчитывает шансы команд и добавляет в список всех шансов на все матчи.
 
     Мутирует входной список `match_forecasts`, добавляя в него новый элемент.
 
     :param match_forecasts: Список предсказаний результатов матчей
+    :param match_id: Идентификатор матча
     :param match_statistic: Список статистических показателей перед матчем
     :param match_rating: Рейтинги команд перед матчем
     """
     forecast = create_forecast(match_statistic, match_rating)
 
     match_forecast: MatchForecast = {
-        'match_id': match_statistic.match_id,
+        'match_id': match_id,
         'forecast': forecast,
         'forecast_rating': None,
         'forecast_all': None,

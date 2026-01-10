@@ -81,8 +81,6 @@ class FieldTypeTotals:
 class MatchStatistics:
     """Статистика перед матчем для домашней и гостевой команды."""
 
-    match_id: MatchId
-    """Идентификатор матча."""
     home_prematch: FieldTypeTotals
     """"Статистика для домашней команды перед матчем."""
     away_prematch: FieldTypeTotals
@@ -187,7 +185,6 @@ def calculate_league_prematch_stats(
         # Сохраняем статистику для текущего матча
         match_id: MatchId = match_detail['match_id']
         match_statistics[match_id] = MatchStatistics(
-            match_id=match_id,
             home_prematch=deepcopy(team_stats[home_team_id]),
             away_prematch=deepcopy(team_stats[away_team_id]),
         )
