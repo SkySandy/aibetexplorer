@@ -194,9 +194,20 @@ def new_rating(home_team_rating_before: int, away_team_rating_before: int,
     # Вычислить бонус за разницу забитых и пропущенных мячей
     goal_difference_adjustment: int = GOAL_DIFFERENCE_MULTIPLIER * (home_score - away_score)
 
-    # Рассчитать рейтинг на основе результата матча, домашнего штрафа, гостевого бонуса и разницы количества голов
-    home_team_rating_after = home_team_rating_before + home_team_rating_adjustment + HOME_FIELD_PENALTY + goal_difference_adjustment
-    away_team_rating_after = away_team_rating_before + away_team_rating_adjustment + AWAY_FIELD_BONUS - goal_difference_adjustment
+    # Рассчитать рейтинг на основе результата матча, домашнего штрафа,
+    # гостевого бонуса и разницы количества голов
+    home_team_rating_after = (
+        home_team_rating_before
+        + home_team_rating_adjustment
+        + HOME_FIELD_PENALTY
+        + goal_difference_adjustment
+    )
+    away_team_rating_after = (
+        away_team_rating_before
+        + away_team_rating_adjustment
+        + AWAY_FIELD_BONUS
+        - goal_difference_adjustment
+    )
 
     return home_team_rating_after, away_team_rating_after
 

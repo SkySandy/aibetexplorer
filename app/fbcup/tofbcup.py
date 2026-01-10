@@ -131,7 +131,11 @@ async def print_championship_teams(
     line_height = 30
     result_width = 45
     command_width = 110
-    team_strings.append(f'{font_size} {result_width} {line_height} {command_width} "{font_name}" {DARK_CYAN} {WHITE} 1174 789')
+    font_string = (
+        f'{font_size} {result_width} {line_height} {command_width} '
+        f'"{font_name}" {DARK_CYAN} {WHITE} 1174 789'
+    )
+    team_strings.append(font_string)
 
     team_strings.append('[TEAMS]')
     pattern = [
