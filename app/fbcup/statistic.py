@@ -3,9 +3,12 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
-from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.utils import calc_avg, calc_avg_percent
+
+if TYPE_CHECKING:
+    from app.betexplorer.schemas import MatchBetexplorer
 
 type MatchId = int
 """Тип для идентификатора матча."""
