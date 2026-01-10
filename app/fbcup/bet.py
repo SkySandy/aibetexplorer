@@ -299,11 +299,9 @@ def create_bet(
     :param detail: Информация о матче
     :param match_chance: Шансы команд
     """
-    if detail['match_id'] == 1627190:
-        pass
     forecast: BookmakerBet = calc_bet(detail, match_chance)
 
-    m_f: MatchBet = MatchBet(
+    match_bet: MatchBet = MatchBet(
         match_id = detail['match_id'],
         forecast = forecast,
         forecast_rating = None,
@@ -311,5 +309,5 @@ def create_bet(
         forecast_all_rating = None,
         forecast_average = None,
     )
-    match_bets.append(m_f)
-    return m_f
+    match_bets.append(match_bet)
+    return match_bet
