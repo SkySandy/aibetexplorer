@@ -1,12 +1,13 @@
 """Расчет рейтингов команд."""
 
-from typing import TypedDict
+from dataclasses import dataclass
 
 from app.betexplorer.schemas import MatchBetexplorer
 from app.fbcup.statistic import MatchId
 
 
-class MatchRating(TypedDict):
+@dataclass(frozen=True)
+class MatchRating:
     """Рейтинги команд на матч."""
 
     match_id: MatchId
@@ -30,6 +31,21 @@ class MatchRating(TypedDict):
     defeat_prob: int
     """Вероятность поражения."""
 
+    def __post_init__(self) -> None:
+        """Валидация полей после инициализации."""
+        # Проверка диапазона вероятностей (0-100)
+        if not (0 <= self.win_prob <= 100):
+            raise ValueError(f'win_prob должен быть в диапазоне [0, 100], получено {self.win_prob}')
+        if not (0 <= self.draw_prob <= 100):
+            raise ValueError(f'draw_prob должен быть в диапазоне [0, 100], получено {self.draw_prob}')
+        if not (0 <= self.defeat_prob <= 100):
+            raise ValueError(f'defeat_prob должен быть в диапазоне [0, 100], получено {self.defeat_prob}')
+
+        # Проверка суммы вероятностей (должна быть равна 100)
+        total = self.win_prob + self.draw_prob + self.defeat_prob
+        if total != 100:
+            raise ValueError(f'Сумма вероятностей должна быть равна 100, получено {total}')
+
 
 def old_rating(match_ratings: list[MatchRating], team_id: int) -> int:
     """Возвращает самый последний рейтинг для команды.
@@ -40,10 +56,10 @@ def old_rating(match_ratings: list[MatchRating], team_id: int) -> int:
     :return: Последний рейтинг команды или 0, если рейтинг не найден
     """
     for match_rating in reversed(match_ratings):
-        if match_rating['home_team_id'] == team_id:
-            return match_rating['home_team_rating_after']
-        if match_rating['away_team_id'] == team_id:
-            return match_rating['away_team_rating_after']
+        if match_rating.home_team_id == team_id:
+            return match_rating.home_team_rating_after
+        if match_rating.away_team_id == team_id:
+            return match_rating.away_team_rating_after
     return 0
 
 
@@ -217,19 +233,19 @@ def calculate_match_rating(
         away_team_rating_before,
     )
 
-    # Создаем и возвращаем структуру рейтинга матча
-    return {
-        'match_id': detail['match_id'],
-        'home_team_id': home_team_id,
-        'away_team_id': away_team_id,
-        'home_team_rating_before': home_team_rating_before,
-        'away_team_rating_before': away_team_rating_before,
-        'home_team_rating_after': home_team_rating_after,
-        'away_team_rating_after': away_team_rating_after,
-        'win_prob': win_prob,
-        'draw_prob': draw_prob,
-        'defeat_prob': defeat_prob,
-    }
+    # Создаем и возвращаем экземпляр MatchRating
+    return MatchRating(
+        match_id=detail['match_id'],
+        home_team_id=home_team_id,
+        away_team_id=away_team_id,
+        home_team_rating_before=home_team_rating_before,
+        away_team_rating_before=away_team_rating_before,
+        home_team_rating_after=home_team_rating_after,
+        away_team_rating_after=away_team_rating_after,
+        win_prob=win_prob,
+        draw_prob=draw_prob,
+        defeat_prob=defeat_prob,
+    )
 
 
 def calc_rating(match_ratings: list[MatchRating], detail: MatchBetexplorer) -> MatchRating:

@@ -107,9 +107,9 @@ def create_forecast(
     else:
         goals_forecast = defeat
 
-    win_prob_rating = (win['percent'] + match_rating['win_prob']) / 2
-    draw_prob_rating = (draw['percent'] + match_rating['draw_prob']) / 2
-    defeat_prob_rating = (defeat['percent'] + match_rating['defeat_prob']) /2
+    win_prob_rating = (win['percent'] + match_rating.win_prob) / 2
+    draw_prob_rating = (draw['percent'] + match_rating.draw_prob) / 2
+    defeat_prob_rating = (defeat['percent'] + match_rating.defeat_prob) / 2
 
     return {
         'win_prob': win['percent'],
