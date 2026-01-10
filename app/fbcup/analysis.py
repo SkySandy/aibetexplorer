@@ -54,7 +54,7 @@ async def one_championship_matches(match_details: list[MatchBetexplorer],
         match_chance = create_team_chances(match_forecasts, match_statistic, match_rating)
         match_bet = create_bet(match_bets, detail, match_chance)
 
-    f_s = calc_forecast_summary(match_details, match_forecasts)
+    calc_forecast_summary(match_details, match_forecasts)
     f_s1 = calc_bet_summary(match_details, match_bets, calc_params)
     return f_s1
 
