@@ -94,62 +94,68 @@ PERCENT_TOTAL = 100
 
 
 def _update_stats(
-        statistics_section: GoalStatistics,
+        stats: GoalStatistics,
         team_score: int,
         opp_score: int,
 ) -> None:
     """Обновляет статистику и вычисляет средние значения.
 
-    :param statistics_section: Раздел статистики
+    :param stats: Раздел статистики
     :param team_score: Количество голов забитых командой
     :param opp_score: Количество голов пропущенных командой
     """
-    statistics_section.count_matches += 1
-    statistics_section.goals_scored += team_score
-    statistics_section.goals_conceded += opp_score
+    stats.count_matches += 1
+    stats.goals_scored += team_score
+    stats.goals_conceded += opp_score
 
     if team_score > opp_score:
-        statistics_section.win += 1
-        statistics_section.goals_scored_win += team_score
-        statistics_section.goals_conceded_win += opp_score
+        stats.win += 1
+        stats.goals_scored_win += team_score
+        stats.goals_conceded_win += opp_score
     elif team_score == opp_score:
-        statistics_section.draw += 1
-        statistics_section.goals_scored_draw += team_score
-        statistics_section.goals_conceded_draw += opp_score
+        stats.draw += 1
+        stats.goals_scored_draw += team_score
+        stats.goals_conceded_draw += opp_score
     else:
-        statistics_section.defeat += 1
-        statistics_section.goals_scored_defeat += team_score
-        statistics_section.goals_conceded_defeat += opp_score
+        stats.defeat += 1
+        stats.goals_scored_defeat += team_score
+        stats.goals_conceded_defeat += opp_score
 
-    count_matches = statistics_section.count_matches
+    matches_count = stats.count_matches
 
-    statistics_section.goals_scored_avg = calc_avg(statistics_section.goals_scored, count_matches)
-    statistics_section.goals_conceded_avg = calc_avg(statistics_section.goals_conceded, count_matches)
-    statistics_section.goals_total_avg = float(
-        Decimal(statistics_section.goals_scored_avg) + Decimal(statistics_section.goals_conceded_avg),
+    stats.goals_scored_avg = calc_avg(stats.goals_scored, matches_count)
+    stats.goals_conceded_avg = calc_avg(stats.goals_conceded, matches_count)
+    stats.goals_total_avg = float(
+        Decimal(stats.goals_scored_avg) + Decimal(stats.goals_conceded_avg),
     )
 
     # Расчет процентов исходов
-    if count_matches != 0:
-        statistics_section.win_percent = calc_avg_percent(statistics_section.win, count_matches)
-        statistics_section.defeat_percent = calc_avg_percent(statistics_section.defeat, count_matches)
-        statistics_section.draw_percent = PERCENT_TOTAL - (
-            statistics_section.win_percent + statistics_section.defeat_percent
+    if matches_count != 0:
+        stats.win_percent = calc_avg_percent(stats.win, matches_count)
+        stats.defeat_percent = calc_avg_percent(stats.defeat, matches_count)
+        stats.draw_percent = PERCENT_TOTAL - (
+            stats.win_percent + stats.defeat_percent
         )
     else:
         # Если матчей не было, то вероятность результата одинакова и равна 33 процентов
-        statistics_section.win_percent = 33
-        statistics_section.defeat_percent = 33
-        statistics_section.draw_percent = 33
+        stats.win_percent = 33
+        stats.defeat_percent = 33
+        stats.draw_percent = 33
 
     # Расчет средних по исходам
-    statistics_section.goals_scored_win_avg = calc_avg(statistics_section.goals_scored_win, statistics_section.win)
-    statistics_section.goals_conceded_win_avg = calc_avg(statistics_section.goals_conceded_win, statistics_section.win)
-    statistics_section.goals_scored_draw_avg = calc_avg(statistics_section.goals_scored_draw, statistics_section.draw)
-    statistics_section.goals_conceded_draw_avg = calc_avg(statistics_section.goals_conceded_draw, statistics_section.draw)
-    statistics_section.goals_scored_defeat_avg = calc_avg(statistics_section.goals_scored_defeat, statistics_section.defeat)
-    statistics_section.goals_conceded_defeat_avg = calc_avg(
-        statistics_section.goals_conceded_defeat, statistics_section.defeat,
+    stats.goals_scored_win_avg = calc_avg(stats.goals_scored_win, stats.win)
+    stats.goals_conceded_win_avg = calc_avg(
+        stats.goals_conceded_win, stats.win,
+    )
+    stats.goals_scored_draw_avg = calc_avg(stats.goals_scored_draw, stats.draw)
+    stats.goals_conceded_draw_avg = calc_avg(
+        stats.goals_conceded_draw, stats.draw,
+    )
+    stats.goals_scored_defeat_avg = calc_avg(
+        stats.goals_scored_defeat, stats.defeat,
+    )
+    stats.goals_conceded_defeat_avg = calc_avg(
+        stats.goals_conceded_defeat, stats.defeat,
     )
 
 
