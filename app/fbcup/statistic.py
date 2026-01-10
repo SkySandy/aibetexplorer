@@ -16,93 +16,132 @@ type MatchId = int
 
 @dataclass
 class GoalStatistics:
-    """Статистика голов."""
+    """Статистика голов команды.
+
+    Содержит исчерпывающую информацию о результативности
+    команды на основе исторических данных о проведенных матчах.
+    Статистика включает общие показатели, а также детализированные
+    данные в зависимости от исхода матча (победа, ничья, поражение).
+    """
 
     count_matches: int = 0
-    """Количество матчей."""
+    """Количество матчей, учтенных в статистике."""
     goals_scored: int = 0
-    """Забито голов."""
+    """Количество голов, забитых командой во всех матчах."""
     goals_conceded: int = 0
-    """Пропущено голов."""
+    """Количество голов, пропущенных командой во всех матчах."""
     goals_scored_avg: float = 0.00
-    """Среднее количество забитых голов за матч."""
+    """Среднее количество забитых голов за матч. Вычисляется как goals_scored / count_matches."""
     goals_conceded_avg: float = 0.00
-    """Среднее количество пропущенных голов за матч."""
+    """Среднее количество пропущенных голов за матч. Вычисляется как goals_conceded / count_matches."""
     goals_total_avg: float = 0.00
-    """Средний тотал за матч."""
+    """Средний тотал голов за матч (забитые + пропущенные). Вычисляется как goals_scored_avg + goals_conceded_avg."""
     win: int = 0
-    """Количество выигранных матчей."""
+    """Количество матчей, завершившихся победой команды."""
     draw: int = 0
-    """Количество ничейных матчей."""
+    """Количество матчей, завершившихся ничьей."""
     defeat: int = 0
-    """Количество проигранных матчей."""
+    """Количество матчей, завершившихся поражением команды."""
     win_percent: int = 33
-    """Процент выигранных матчей."""
+    """Процент матчей, завершившихся победой команды. Вычисляется как (win / count_matches) * 100."""
     draw_percent: int = 33
-    """Процент ничейных матчей."""
+    """Процент матчей, завершившихся ничьей. Вычисляется как (draw / count_matches) * 100."""
     defeat_percent: int = 33
-    """Процент проигранных матчей."""
+    """Процент матчей, завершившихся поражением команды. Вычисляется как (defeat / count_matches) * 100."""
     goals_scored_win: int = 0
-    """Забито голов при победе."""
+    """Количество голов, забитых в победных матчах."""
     goals_conceded_win: int = 0
-    """Пропущено голов при победе."""
+    """Количество голов, пропущенных в победных матчах."""
     goals_scored_draw: int = 0
-    """Забито голов при ничьи."""
+    """Количество голов, забитых в ничейных матчах."""
     goals_conceded_draw: int = 0
-    """Пропущено голов при ничьи."""
+    """Количество голов, пропущенных в ничейных матчах."""
     goals_scored_defeat: int = 0
-    """Забито голов при поражении."""
+    """Количество голов, забитых в проигранных матчах."""
     goals_conceded_defeat: int = 0
-    """Пропущено голов при поражении."""
+    """Количество голов, пропущенных в проигранных матчах."""
     goals_scored_win_avg: float = 0.00
-    """Среднее количество забитых голов при победе."""
+    """Среднее количество забитых голов в победных матчах. Вычисляется как goals_scored_win / win."""
     goals_conceded_win_avg: float = 0.00
-    """Среднее количество пропущенных голов при победе."""
+    """Среднее количество пропущенных голов в победных матчах. Вычисляется как goals_conceded_win / win."""
     goals_scored_draw_avg: float = 0.00
-    """Среднее количество забитых голов при ничьи."""
+    """Среднее количество забитых голов в ничейных матчах. Вычисляется как goals_scored_draw / draw."""
     goals_conceded_draw_avg: float = 0.00
-    """Среднее количество пропущенных голов при ничьи."""
+    """Среднее количество пропущенных голов в ничейных матчах. Вычисляется как goals_conceded_draw / draw."""
     goals_scored_defeat_avg: float = 0.00
-    """Среднее количество забитых голов при поражении."""
+    """Среднее количество забитых голов в проигранных матчах. Вычисляется как goals_scored_defeat / defeat."""
     goals_conceded_defeat_avg: float = 0.00
-    """Среднее количество пропущенных голов при поражении."""
+    """Среднее количество пропущенных голов в проигранных матчах. Вычисляется как goals_conceded_defeat / defeat."""
 
 
 @dataclass
 class FieldTypeTotals:
-    """Статистика при игре На нейтральном поле, дома, в гостях."""
+    """Статистика команды при игре на разных типах поля.
+
+    Агрегирует статистику команды в трех разрезах: все матчи, домашние матчи и выездные матчи.
+    Это позволяет учитывать фактор домашнего поля при анализе и прогнозировании.
+    """
 
     all: GoalStatistics = field(default_factory=GoalStatistics)
-    """Все матчи (поле не важно)."""
+    """Статистика по всем матчам команды, независимо от того, где проводился матч (дома или в гостях)."""
     home: GoalStatistics = field(default_factory=GoalStatistics)
-    """Матчи дома."""
+    """Статистика только по домашним матчам команды."""
     away: GoalStatistics = field(default_factory=GoalStatistics)
-    """Матчи в гостях."""
+    """Статистика только по выездным матчам команды."""
 
 
 @dataclass
 class MatchStatistics:
-    """Статистика перед матчем для домашней и гостевой команды."""
+    """Полная предматчевая статистика для обеих команд.
+
+    Объединяет предматчевую статистику для домашней и гостевой команды.
+    Статистика рассчитывается на основе всех предыдущих матчей команд в рамках чемпионата до текущего момента.
+    """
 
     home_prematch: FieldTypeTotals
-    """"Статистика для домашней команды перед матчем."""
+    """"Предматчевая статистика домашней команды.
+        Содержит данные о всех матчах, домашних и выездных выступлениях команды до текущего матча."""
     away_prematch: FieldTypeTotals
-    """"Статистика для гостевой команды перед матчем."""
+    """"Предматчевая статистика гостевой команды.
+        Содержит данные о всех матчах, домашних и выездных выступлениях команды до текущего матча."""
 
 
 PERCENT_TOTAL = 100
+"""Константа, представляющая 100 процентов для расчетов."""
 
 
 def _update_stats(
-        stats: GoalStatistics,
-        team_score: int,
-        opp_score: int,
+    stats: GoalStatistics,
+    team_score: int,
+    opp_score: int,
 ) -> None:
-    """Обновляет статистику и вычисляет средние значения.
+    """Обновляет статистику команды и вычисляет средние значения.
 
-    :param stats: Раздел статистики
-    :param team_score: Количество голов забитых командой
-    :param opp_score: Количество голов пропущенных командой
+    Данная функция обновляет все поля статистики на основе результата одного матча.
+    Выполняется пересчет всех средних значений и процентов,
+    чтобы отражать актуальное состояние статистики после учета нового матча.
+
+    :param stats: Объект статистики, который необходимо обновить. Функция модифицирует переданный объект.
+    :param team_score: Количество голов, забитых анализируемой командой в матче.
+    :param opp_score: Количество голов, забитых соперником в матче.
+
+    Notes
+    -----
+    Функция выполняет следующие действия:
+        1. Увеличивает счетчик матчей на единицу.
+        2. Добавляет забитые и пропущенные голы к соответствующим суммам.
+        3. Определяет исход матча (победа, ничья, поражение) и обновляет соответствующие счетчики.
+        4. Пересчитывает все средние значения и проценты.
+
+    Средние значения вычисляются как отношение суммы к количеству:
+        - goals_scored_avg = goals_scored / count_matches
+        - goals_conceded_avg = goals_conceded / count_matches
+        - goals_total_avg = goals_scored_avg + goals_conceded_avg
+
+    Проценты исходов вычисляются как отношение количества матчей с данным исходом
+    к общему количеству матчей, умноженное на 100.
+    Если матчей не было, все проценты устанавливаются в значение 33.
+
     """
     stats.count_matches += 1
     stats.goals_scored += team_score
@@ -144,52 +183,89 @@ def _update_stats(
 
     # Расчет средних по исходам
     stats.goals_scored_win_avg = calc_avg(stats.goals_scored_win, stats.win)
-    stats.goals_conceded_win_avg = calc_avg(
-        stats.goals_conceded_win, stats.win,
-    )
+    stats.goals_conceded_win_avg = calc_avg(stats.goals_conceded_win, stats.win)
+
     stats.goals_scored_draw_avg = calc_avg(stats.goals_scored_draw, stats.draw)
-    stats.goals_conceded_draw_avg = calc_avg(
-        stats.goals_conceded_draw, stats.draw,
-    )
-    stats.goals_scored_defeat_avg = calc_avg(
-        stats.goals_scored_defeat, stats.defeat,
-    )
-    stats.goals_conceded_defeat_avg = calc_avg(
-        stats.goals_conceded_defeat, stats.defeat,
-    )
+    stats.goals_conceded_draw_avg = calc_avg(stats.goals_conceded_draw, stats.draw)
+
+    stats.goals_scored_defeat_avg = calc_avg(stats.goals_scored_defeat, stats.defeat)
+    stats.goals_conceded_defeat_avg = calc_avg(stats.goals_conceded_defeat, stats.defeat)
 
 
-def _update_team_stat(team_stats: FieldTypeTotals, match_info: MatchBetexplorer, is_home: bool) -> None:  # noqa: FBT001
-    """Обновляет статистику команды для всех разделов.
+def _update_team_stat(
+    team_stats: FieldTypeTotals,
+    match_info: MatchBetexplorer,
+    is_home: bool,  # noqa: FBT001
+) -> None:
+    """Обновляет статистику команды для всех разделов статистики.
 
-    :param team_stats: Статистика команды
-    :param match_info: Данные матча
-    :param is_home: Флаг домашней команды
+    Данная функция обновляет статистику команды сразу в трех разрезах:
+    общая статистика (все матчи), домашние матчи и выездные матчи.
+    Это позволяет поддерживать актуальную статистику для каждого типа
+    выступлений команды.
+
+    :param team_stats: Объект статистики команды, содержащий три раздела: all, home и away.
+        Функция модифицирует переданный объект, обновляя соответствующие разделы статистики.
+    :param match_info: Словарь с информацией о матче, содержащий данные о счете и командах.
+        Должен содержать ключи 'home_score' и 'away_score' с количеством
+        голов домашней и гостевой команды соответственно.
+    :param is_homeё: Флаг, указывающий, является ли анализируемая команда домашней.
+        Если True, обновляется раздел home, иначе - раздел away.
+
+    Notes
+    -----
+    Функция определяет количество забитых и пропущенных голов команды на основе флага is_home и счета матча.
+    Затем обновляет общую статистику (раздел all) и статистику для соответствующего типа поля
+    (home или away), вызывая функцию _update_stats для каждого раздела.
+
     """
     team_score: int = match_info['home_score'] if is_home else match_info['away_score']
     opp_score: int = match_info['away_score'] if is_home else match_info['home_score']
 
     # Обновляем общую статистику и статистику по типу поля
-    _update_stats(team_stats.all, team_score, opp_score)
-    _update_stats(team_stats.home if is_home else team_stats.away, team_score, opp_score)
+    _update_stats(
+        team_stats.all,
+        team_score,
+        opp_score,
+    )
+    _update_stats(
+        team_stats.home if is_home else team_stats.away,
+        team_score,
+        opp_score,
+    )
 
 
 def calculate_league_prematch_stats(
-        championship_matches: list[MatchBetexplorer],
+    championship_matches: list[MatchBetexplorer],
 ) -> dict[MatchId, MatchStatistics]:
     """Рассчитывает предматчевую статистику для всех матчей чемпионата.
 
-    :param championship_matches: Список матчей чемпионата (должны быть отсортированы в хронологическом порядке)
-    :return: Словарь статистических показателей перед матчами, где ключ - match_id
+    Данная функция выполняет последовательный проход по списку матчей
+    и для каждого матча вычисляет предматчевую статистику для обеих команд.
+    Предматчевая статистика формируется на основе всех предыдущих матчей
+    команд в рамках данного чемпионата.
+
+    :param championship_matches: Список матчей чемпионата в хронологическом порядке.
+
+    Notes
+    -----
+    Важно, чтобы список матчей был отсортирован в хронологическом порядке,
+    так как предматчевая статистика для каждого матча рассчитывается на
+    основе только предыдущих матчей. Матчи без счета (home_score или
+    away_score равны None) не учитываются при обновлении статистики команд.
+
+    Для сохранения предматчевой статистики используется глубокое копирование
+    (deepcopy) объектов FieldTypeTotals, чтобы избежать изменения статистики
+    при последующих обновлениях.
+
     """
     # Инициализация хранилища статистики для команд
     team_stats: dict[int, FieldTypeTotals] = defaultdict(FieldTypeTotals)
     match_statistics: dict[MatchId, MatchStatistics] = {}
 
     for match_detail in championship_matches:
-        # Извлекаем идентификаторы команд
-        home_team_id: int = match_detail['home_team_id']
-        away_team_id: int = match_detail['away_team_id']
+        home_team_id = match_detail['home_team_id']
+        away_team_id = match_detail['away_team_id']
 
         # Сохраняем статистику для текущего матча
         match_id: MatchId = match_detail['match_id']
