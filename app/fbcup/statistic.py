@@ -159,7 +159,7 @@ def _update_stats(
     )
 
 
-def _update_team_stat(team_stats: FieldTypeTotals, match_info: MatchBetexplorer, is_home: bool) -> None:
+def _update_team_stat(team_stats: FieldTypeTotals, match_info: MatchBetexplorer, is_home: bool) -> None:  # noqa: FBT001
     """Обновляет статистику команды для всех разделов.
 
     :param team_stats: Статистика команды
