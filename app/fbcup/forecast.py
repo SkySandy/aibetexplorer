@@ -111,7 +111,7 @@ def create_forecast(
     draw_prob_rating = (draw['percent'] + match_rating['draw_prob']) / 2
     defeat_prob_rating = (defeat['percent'] + match_rating['defeat_prob']) /2
 
-    fi: ForecastInfo = {
+    return {
         'win_prob': win['percent'],
         'draw_prob': draw['percent'],
         'defeat_prob': defeat['percent'],
@@ -124,7 +124,6 @@ def create_forecast(
         'draw_prob_rating': draw_prob_rating,
         'defeat_prob_rating': defeat_prob_rating,
     }
-    return fi
 
 
 def create_team_chances(
@@ -140,11 +139,9 @@ def create_team_chances(
     :param match_statistic: Список статистических показателей перед матчем
     :param match_rating: Рейтинги команд перед матчем
     """
-    if match_statistic.match_id == 1627190:
-        pass
     forecast = create_forecast(match_statistic, match_rating)
 
-    m_f: MatchForecast = {
+    match_forecast: MatchForecast = {
         'match_id': match_statistic.match_id,
         'forecast': forecast,
         'forecast_rating': None,
@@ -152,5 +149,5 @@ def create_team_chances(
         'forecast_all_rating': None,
         'forecast_average': None,
     }
-    match_forecasts.append(m_f)
-    return m_f
+    match_forecasts.append(match_forecast)
+    return match_forecast
