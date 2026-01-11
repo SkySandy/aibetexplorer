@@ -124,9 +124,9 @@ def calc_margin(odds_1: float, odds_2: float, odds_x: float | None = None) -> fl
     """
     if odds_x is None:
         # Двухсторонняя ставка
-        return float(((HUNDRED / Decimal(odds_1)) + (HUNDRED / Decimal(odds_2)) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
+        return float(((HUNDRED / Decimal(odds_1)) + (HUNDRED / Decimal(odds_2)) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
     # Трехсторонняя ставка
-    return float((HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) + HUNDRED / Decimal(odds_x) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
+    return float((HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) + HUNDRED / Decimal(odds_x) - HUNDRED).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
 
 
 def calc_prob(odds: float, odds_1: float, odds_2: float | None = None) -> float:
@@ -143,9 +143,9 @@ def calc_prob(odds: float, odds_1: float, odds_2: float | None = None) -> float:
     """
     if odds_2 is None:
         # Двухсторонняя ставка
-        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))
+        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
     # Трехсторонняя ставка
-    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))
+    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
 
 
 def calc_double_odds(odds_1: float, odds_2: float) -> float:
@@ -159,4 +159,4 @@ def calc_double_odds(odds_1: float, odds_2: float) -> float:
     :param odds_2: Букмекерский коэффициент второго исхода
     :return: Коэффициент для двойного события, округленный до двух знаков
     """
-    return float((HUNDRED / (HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2))).quantize(PRECISION, ROUND_HALF_UP))
+    return float((HUNDRED / (HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2))).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
