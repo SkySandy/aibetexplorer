@@ -3,7 +3,8 @@
 from decimal import ROUND_HALF_DOWN, ROUND_HALF_UP, Decimal
 
 PRECISION = Decimal('.01')
-
+HUNDRED = Decimal(100)
+ONE = Decimal(1)
 
 def calc_avg(sum_value: float, count: int) -> float:
     """Посчитывает среднее с округлением до двух знаков.
@@ -16,9 +17,6 @@ def calc_avg(sum_value: float, count: int) -> float:
     return float((Decimal(sum_value) / Decimal(count)).quantize(PRECISION, ROUND_HALF_UP))
 
 
-HUNDRED = Decimal(100)
-
-
 def calc_avg_percent(sum_value: float, count: int) -> int:
     """Вычисляет среднее значение в процентах с округлением до целого числа.
 
@@ -27,7 +25,7 @@ def calc_avg_percent(sum_value: float, count: int) -> int:
     """
     if count == 0:
         return 0
-    return int((HUNDRED * Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_UP))
+    return int((HUNDRED * Decimal(sum_value) / Decimal(count)).quantize(ONE, ROUND_HALF_UP))
 
 
 def calc_total_percent(under: int, equals: int, over: int) -> dict[str, int]:
@@ -53,7 +51,7 @@ def rounds_whole(sum_value: float, count: int) -> int:
     """
     if count == 0:
         return 0
-    return int((Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_UP))
+    return int((Decimal(sum_value) / Decimal(count)).quantize(ONE, ROUND_HALF_UP))
 
 
 def rounds_goal(sum_value: float, count: int) -> int:
@@ -64,10 +62,7 @@ def rounds_goal(sum_value: float, count: int) -> int:
     """
     if count == 0:
         return 0
-    return int((Decimal(sum_value) / Decimal(count)).quantize(Decimal(1), ROUND_HALF_DOWN))
-
-
-ONE = Decimal(1)
+    return int((Decimal(sum_value) / Decimal(count)).quantize(ONE, ROUND_HALF_DOWN))
 
 
 def odds_to_prob(odds: float) -> float:
