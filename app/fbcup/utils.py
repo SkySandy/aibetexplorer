@@ -13,7 +13,7 @@ def calc_avg(sum_value: float, count: int) -> float:
     :param count: Количество
     """
     if count == 0:
-        return 0
+        return 0.0
     return float((Decimal(sum_value) / Decimal(count)).quantize(PRECISION, ROUND_HALF_UP))
 
 
@@ -36,6 +36,8 @@ def calc_total_percent(under: int, equals: int, over: int) -> dict[str, int]:
     :param over: Количество случаев «больше».
     """
     count = under + equals + over
+    if count == 0:
+        return {'under_percent': 0, 'equals_percent': 0, 'over_percent': 0}
     return {
         'under_percent': calc_avg_percent(under, count),
         'equals_percent': calc_avg_percent(equals, count),
