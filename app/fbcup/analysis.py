@@ -31,8 +31,8 @@ async def analysis_championship(crd: CRUDbetexplorer, session: AsyncSession | No
 
     for round_number in range(1, 32):
         calc_params.round_number = round_number
-        bs = await one_championship_matches(match_details, match_statistics, calc_params)
-        result_bet.append(bs)
+        bet_summary = await one_championship_matches(match_details, match_statistics, calc_params)
+        result_bet.append(bet_summary)
     pass
 
 
