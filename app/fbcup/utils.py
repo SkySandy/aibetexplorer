@@ -134,7 +134,7 @@ def calc_prob(odds: float, odds_1: float, odds_2: float | None = None) -> float:
 
     Функция корректирует вероятность события, полученную из коэффициента,
     с учетом маржи букмекера. Для этого используется формула нормализации
-    вероятностей.
+    вероятностей: истинная вероятность = вероятность события / сумму вероятностей всех исходов.
 
     :param odds: Букмекерский коэффициент для расчета вероятности
     :param odds_1: Букмекерский коэффициент первого исхода
@@ -142,10 +142,18 @@ def calc_prob(odds: float, odds_1: float, odds_2: float | None = None) -> float:
     :return: Истинная вероятность в процентах, округленная до двух знаков
     """
     if odds_2 is None:
-        # Двухсторонняя ставка
-        return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
-    # Трехсторонняя ставка
-    return float((HUNDRED / Decimal(odds) / (ONE + (HUNDRED / Decimal(odds) + HUNDRED / Decimal(odds_1) + HUNDRED / Decimal(odds_2) - HUNDRED) / HUNDRED)).quantize(PRECISION, ROUND_HALF_UP))  # noqa: E501
+        # Двухсторонняя ставка: нормализация вероятностей двух исходов
+        prob_odds = HUNDRED / Decimal(odds)
+        prob_odds_1 = HUNDRED / Decimal(odds_1)
+        total_prob = prob_odds + prob_odds_1
+        return float((prob_odds / total_prob * HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
+
+    # Трехсторонняя ставка: нормализация вероятностей трех исходов
+    prob_odds = HUNDRED / Decimal(odds)
+    prob_odds_1 = HUNDRED / Decimal(odds_1)
+    prob_odds_2 = HUNDRED / Decimal(odds_2)
+    total_prob = prob_odds + prob_odds_1 + prob_odds_2
+    return float((prob_odds / total_prob * HUNDRED).quantize(PRECISION, ROUND_HALF_UP))
 
 
 def calc_double_odds(odds_1: float, odds_2: float) -> float:
