@@ -1,19 +1,26 @@
-"""Схемы описания структур системы."""
-import datetime
+"""Схемы описания структур данных для парсинга и хранения информации с BetExplorer.
+
+Модуль содержит типизированные структуры данных (TypedDict) для описания всех сущностей
+системы: видов спорта, стран, чемпионатов, команд, матчей и связанных с ними событий.
+Также включает перечисление видов спорта и константы для типов событий в матчах.
+"""
 import enum
-from typing import Optional, TypedDict, Final
+from typing import TYPE_CHECKING, Final, TypedDict
+
+if TYPE_CHECKING:
+    import datetime
 
 
 class SportType(enum.Enum):
-    """Виды спорта."""
+    """Перечисление поддерживаемых видов спорта."""
 
-    FOOTBALL: int = 1
-    BASKETBALL: int = 2
-    HOCKEY: int = 3
-    TENNIS: int = 4
-    BASEBALL: int = 5
-    VOLLEYBALL: int = 6
-    HANDBALL: int = 7
+    FOOTBALL = 1
+    BASKETBALL = 2
+    HOCKEY = 3
+    TENNIS = 4
+    BASEBALL = 5
+    VOLLEYBALL = 6
+    HANDBALL = 7
 
 
 sports_url = {
@@ -25,17 +32,18 @@ sports_url = {
     SportType.VOLLEYBALL: '/volleyball/',
     SportType.HANDBALL: '/handball/',
 }
+"""Словарь URL-путей для каждого вида спорта на сайте BetExplorer."""
 
 
 class SportBetexplorer(TypedDict):
-    """Виды спорта."""
+    """Структура данных для описания вида спорта."""
 
-    sport_id: Optional[int]
-    """Идентификатор вида спорта."""
+    sport_id: int | None
+    """Уникальный идентификатор вида спорта в базе данных."""
     sport_name: str
-    """Название вида спорта."""
+    """Наименование вида спорта на английском языке."""
     sport_url: str
-    """Ссылка на страницу вида спорта."""
+    """URL-путь к странице вида спорта на сайте BetExplorer."""
 
 
 SPORTS: list[SportBetexplorer] = [
@@ -75,198 +83,201 @@ SPORTS: list[SportBetexplorer] = [
         'sport_url': sports_url[SportType.HANDBALL],
     },
 ]
+"""Список всех поддерживаемых видов спорта с их идентификаторами и URL-путями."""
 
 
 class CountryBetexplorer(TypedDict):
-    """Страна."""
+    """Структура данных для описания страны."""
 
-    country_id: Optional[int]
-    """Идентификатор страны."""
+    country_id: int | None
+    """Уникальный идентификатор страны в базе данных."""
     country_url: str
-    """Ссылка на все чемпионаты проводимые в стране."""
+    """URL-путь к странице со всеми чемпионатами страны на сайте BetExplorer."""
     country_name: str
-    """Название страны."""
+    """Наименование страны на английском языке."""
     country_order: int
-    """Порядковый номер страны."""
+    """Порядковый номер страны в списке стран."""
     country_flag_url: str
-    """Ссылка на флаг страны."""
+    """URL-путь к изображению флага страны."""
 
 
 class ChampionshipBetexplorer(TypedDict):
-    """Чемпионат."""
+    """Структура данных для описания чемпионата."""
 
-    championship_id: Optional[int]
-    """Идентификатор чемпионата."""
-    sport_id: Optional[int]
-    """Вид спорта."""
-    country_id: Optional[int]
+    championship_id: int | None
+    """Уникальный идентификатор чемпионата в базе данных."""
+    sport_id: int | None
+    """Идентификатор вида спорта."""
+    country_id: int | None
     """Идентификатор страны."""
     championship_url: str
-    """Ссылка на страницу чемпионата."""
+    """URL-путь к странице чемпионата на сайте BetExplorer."""
     championship_name: str
-    """Название чемпионата."""
+    """Наименование чемпионата."""
     championship_order: int
-    """Порядковый номер чемпионата."""
+    """Порядковый номер чемпионата в списке."""
     championship_years: str
-    """Годы проведения чемпионата."""
+    """Период проведения чемпионата."""
 
 
 class TeamBetexplorer(TypedDict):
-    """Команда."""
+    """Структура данных для описания команды."""
 
-    team_id: Optional[int]
-    """Идентификатор команды."""
-    sport_id: Optional[int]
-    """Вид спорта."""
-    team_name: Optional[str]
-    """Название команды."""
-    team_full: Optional[str]
-    """Название команды (полное)."""
-    team_url: Optional[str]
-    """Ссылка на страницу команды."""
-    team_country: Optional[str]
-    """Страна команды."""
-    country_id: Optional[int]
+    team_id: int | None
+    """Уникальный идентификатор команды в базе данных."""
+    sport_id: int | None
+    """Идентификатор вида спорта."""
+    team_name: str | None
+    """Краткое наименование команды."""
+    team_full: str | None
+    """Полное наименование команды."""
+    team_url: str | None
+    """URL-путь к странице команды на сайте BetExplorer."""
+    team_country: str | None
+    """Наименование страны команды."""
+    country_id: int | None
     """Идентификатор страны."""
-    team_emblem: Optional[str]
-    """"Эмблема команды."""
-    download_date: Optional[datetime.datetime]
-    """"Дата загрузки информации."""
-    save_date: Optional[datetime.datetime]
-    """"Дата сохранения информации в базе данных."""
+    team_emblem: str | None
+    """URL-путь к эмблеме команды."""
+    download_date: datetime.datetime | None
+    """Дата и время загрузки информации о команде."""
+    save_date: datetime.datetime | None
+    """Дата и время последнего обновления информации в базе данных."""
 
 
 class ScoreHalvesBetexplorer(TypedDict):
-    """Результат тайма, периода, дополнительного времени."""
+    """Структура данных для описания результата по таймам или периодам."""
 
-    time_id: Optional[int]
-    """Идентификатор тайма."""
+    time_id: int | None
+    """Уникальный идентификатор записи в базе данных."""
     half_number: int
-    """Номер тайма."""
+    """Номер тайма или периода."""
     home_score: int
-    """Количество голов забитых домашней командой."""
+    """Количество очков, забитых домашней командой."""
     away_score: int
-    """Количество голов забитых командой гостей."""
+    """Количество очков, забитых гостевой командой."""
 
 
 class ShooterBetexplorer(TypedDict):
-    """Информация о голах, заброшенных шайбах."""
+    """Структура данных для описания информации о голах или заброшенных шайбах."""
 
-    shooter_id: Optional[int]
-    """Идентификатор информации об голах."""
-    home_away: Optional[int]
-    """Событие домашней (0) или гостевой (1) команды."""
-    event_time: Optional[str]
-    """Время гола."""
-    overtime: Optional[str]
+    shooter_id: int | None
+    """Уникальный идентификатор записи в базе данных."""
+    home_away: int | None
+    """Признак команды: 0 - домашняя, 1 - гостевая."""
+    event_time: str | None
+    """Время наступления события."""
+    overtime: str | None
     """Дополнительное время."""
-    player_name: Optional[str]
-    """Фамилия игрока."""
-    penalty_kick: Optional[str]
-    """Гол забит с пенальти."""
+    player_name: str | None
+    """Фамилия игрока, забившего гол."""
+    penalty_kick: str | None
+    """Признак гола с пенальти."""
     event_order: int
-    """Порядковый номер события."""
+    """Порядковый номер события в матче."""
 
 
 class ChampionshipStageBetexplorer(TypedDict):
-    """Стадия чемпионата."""
+    """Структура данных для описания стадии чемпионата."""
 
-    stage_id: Optional[int]
-    """Идентификатор стадии чемпионата."""
+    stage_id: int | None
+    """Уникальный идентификатор стадии в базе данных."""
     stage_url: str
-    """Ссылка на стадию чемпионата."""
+    """URL-путь к странице стадии на сайте BetExplorer."""
     stage_name: str
-    """Название стадии чемпионата."""
+    """Наименование стадии."""
     stage_order: int
-    """Порядковый номер стадии чемпионата."""
+    """Порядковый номер стадии."""
     stage_current: bool
-    """Текущая стадия чемпионата."""
+    """Признак текущей стадии."""
 
 
 EVENT_BTC: Final[int] = 0
-"""Ставка: обе забьют"""
+"""Идентификатор типа события: обе команды забьют."""
 EVENT_OU: Final[int] = 1
-"""Ставка: больше-меньше"""
+"""Идентификатор типа события: больше-меньше."""
 EVENT_AH: Final[int] = 2
-"""Ставка: фора"""
+"""Идентификатор типа события: азиатская фора."""
 
 
 class MatchEventBetexplorer(TypedDict):
-    """Статистика матча."""
+    """Структура данных для описания статистических событий матча."""
 
-    match_event_id: Optional[int]
-    """Идентификатор события в матче."""
-    match_id: Optional[int]
+    match_event_id: int | None
+    """Уникальный идентификатор события в базе данных."""
+    match_id: int | None
     """Идентификатор матча."""
-    event_type_id: Optional[int]
+    event_type_id: int | None
     """Идентификатор типа события (обе забьют, тотал, фора)."""
-    indicator: Optional[str]
-    """Значение показателя (тотала, форы)."""
-    odds_less: Optional[float]
-    """Коэффициент на меньше."""
-    odds_greater: Optional[float]
-    """Коэффициент на больше."""
+    indicator: str | None
+    """Значение показателя (линия тотала, значение форы)."""
+    odds_less: float | None
+    """Коэффициент на исход меньше."""
+    odds_greater: float | None
+    """Коэффициент на исход больше."""
 
 
 class MatchBetexplorer(TypedDict):
-    """Результат матча."""
+    """Структура данных для описания матча."""
 
     match_id: int
-    """Идентификатор матча."""
+    """Уникальный идентификатор матча в базе данных."""
     championship_id: int
     """Идентификатор чемпионата."""
     match_url: str
-    """Ссылка на матч."""
+    """URL-путь к странице матча на сайте BetExplorer."""
     home_team_id: int
     """Идентификатор домашней команды."""
     home_team: TeamBetexplorer
-    """Домашняя команда."""
-    home_team_emblem: Optional[str]
-    """"Эмблема домашней команды."""
+    """Информация о домашней команде."""
+    home_team_emblem: str | None
+    """URL-путь к эмблеме домашней команды."""
     away_team_id: int
-    """Идентификатор команды гостей."""
+    """Идентификатор гостевой команды."""
     away_team: TeamBetexplorer
-    """Команда гостей."""
-    away_team_emblem: Optional[str]
-    """"Эмблема команды гостей."""
-    home_score: Optional[int]
-    """Количество голов забитых домашней командой."""
-    away_score: Optional[int]
-    """Количество голов забитых командой гостей."""
-    odds_1: Optional[float]
-    """Коэффициент на победу хозяев."""
-    odds_x: Optional[float]
+    """Информация о гостевой команде."""
+    away_team_emblem: str | None
+    """URL-путь к эмблеме гостевой команды."""
+    home_score: int | None
+    """Количество очков, забитых домашней командой."""
+    away_score: int | None
+    """Количество очков, забитых гостевой командой."""
+    odds_1: float | None
+    """Коэффициент на победу домашней команды."""
+    odds_x: float | None
     """Коэффициент на ничью."""
-    odds_2: Optional[float]
-    """Коэффициент на победу гостей."""
-    game_date: Optional[datetime.datetime]
-    """Дата игры."""
-    score_stage: Optional[str]
-    """Примечания к результату матча (победа по пенальти, игра прервалась и прочие)."""
-    score_stage_short: Optional[str]
-    """Примечание к результату в кратком виде."""
+    odds_2: float | None
+    """Коэффициент на победу гостевой команды."""
+    game_date: datetime.datetime | None
+    """Дата и время проведения матча."""
+    score_stage: str | None
+    """Примечания к результату матча (победа по пенальти, прерывание и т.д.)."""
+    score_stage_short: str | None
+    """Краткое примечание к результату."""
     stage_name: str
-    """Стадия чемпионата (квалификация, групповой этап и прочие)."""
+    """Наименование стадии чемпионата."""
     score_halves: list[ScoreHalvesBetexplorer]
-    """Таймы матча."""
+    """Список результатов по таймам или периодам."""
     shooters: list[ShooterBetexplorer]
-    """Кто забивал голы."""
+    """Список информации о голах или заброшенных шайбах."""
     match_event: list[MatchEventBetexplorer]
-    """Статистика матча."""
-    download_date: Optional[datetime.datetime]
-    """Дата-время загрузки информации."""
-    save_date: Optional[datetime.datetime]
-    """Дата-время последнего обновления."""
-    round_name: Optional[str]
-    """Название тура."""
-    round_number: Optional[int]
+    """Список статистических событий матча."""
+    download_date: datetime.datetime | None
+    """Дата и время загрузки информации о матче."""
+    save_date: datetime.datetime | None
+    """Дата и время последнего обновления информации в базе данных."""
+    round_name: str | None
+    """Наименование тура."""
+    round_number: int | None
     """Номер тура."""
     is_fixture: int
-    """Строка это результат (0) или расписание (1)."""
+    """Признак типа записи: 0 - результат, 1 - расписание."""
 
 
 class ResultsBetexplorer(TypedDict):
-    """Стадии вместе с чемпионатами."""
+    """Структура данных для описания результатов чемпионата со стадиями."""
 
     stages: list[ChampionshipStageBetexplorer]
+    """Список стадий чемпионата."""
     matches: list[MatchBetexplorer]
+    """Список матчей."""
