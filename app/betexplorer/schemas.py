@@ -11,7 +11,7 @@ if TYPE_CHECKING:
     import datetime
 
 
-class SportType(enum.Enum):
+class SportType(int, enum.Enum):
     """Перечисление поддерживаемых видов спорта."""
 
     FOOTBALL = 1
