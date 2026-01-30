@@ -1,8 +1,6 @@
-"""Схемы описания структур данных для парсинга и хранения информации с BetExplorer.
+"""TypedDict схемы для типизации данных BetExplorer.
 
-Модуль содержит типизированные структуры данных (TypedDict) для описания всех сущностей
-системы: видов спорта, стран, чемпионатов, команд, матчей и связанных с ними событий.
-Также включает перечисление видов спорта и константы для типов событий в матчах.
+Определяет структуры данных для всех сущностей системы.
 """
 import enum
 from typing import TYPE_CHECKING, Final, TypedDict
@@ -32,7 +30,7 @@ sports_url = {
     SportType.VOLLEYBALL: '/volleyball/',
     SportType.HANDBALL: '/handball/',
 }
-"""Словарь URL-путей для каждого вида спорта на сайте BetExplorer."""
+"""URL-пути для каждого вида спорта на сайте BetExplorer."""
 
 
 class SportBetexplorer(TypedDict):
@@ -83,7 +81,7 @@ SPORTS: list[SportBetexplorer] = [
         'sport_url': sports_url[SportType.HANDBALL],
     },
 ]
-"""Список всех поддерживаемых видов спорта с их идентификаторами и URL-путями."""
+"""Список поддерживаемых видов спорта с идентификаторами и URL-путями."""
 
 
 class CountryBetexplorer(TypedDict):
@@ -159,7 +157,7 @@ class ScoreHalvesBetexplorer(TypedDict):
 
 
 class ShooterBetexplorer(TypedDict):
-    """Структура данных для описания информации о голах или заброшенных шайбах."""
+    """Структура данных для описания голов или заброшенных шайб."""
 
     shooter_id: int | None
     """Уникальный идентификатор записи в базе данных."""
