@@ -47,7 +47,7 @@
 
 ## База данных
 
-**СУБД**: PostgreSQL (основная), SQLite (для тестов)
+**СУБД**: PostgreSQL 15+ (основная), SQLite (для тестов)
 
 **Основные таблицы**:
 - `sport` - Виды спорта
@@ -63,14 +63,14 @@
 
 ## Технологический стек
 
-- **Язык**: Python 3.13
+- **Язык**: Python 3.14 (требуется только эта версия)
 - **Асинхронность**: asyncio, aiohttp, aiofiles
 - **ORM**: SQLAlchemy (async)
 - **Парсинг**: selectolax
 - **Анализ данных**: polars, pandera
 - **Тестирование**: pytest, pytest-asyncio
 - **Линтинг**: ruff
-- **База данных**: PostgreSQL (asyncpg), SQLite (aiosqlite)
+- **База данных**: PostgreSQL 15+ (asyncpg), SQLite (aiosqlite)
 
 ## Конфигурация
 
