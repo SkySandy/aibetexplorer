@@ -165,4 +165,7 @@ app/config.py
 
 .qodo
 
+# MCP configuration
+@mcp.json
+
 
