@@ -165,7 +165,7 @@ app/config.py
 
 .qodo
 
-# MCP configuration
-@mcp.json
+# Kilo Code configuration and context (contains sensitive data)
+.kilocode/
 
 
