@@ -40,12 +40,14 @@ graph TD
 
 **models.py** (312 строки)
 - SQLAlchemy модели для всех таблиц базы данных
-- Основные модели: `Sport`, `Country`, `Championship`, `Team`, `Match`, `TimeScore`, `Shooter`, `MatchEvent`, `ChampionshipStage`
+- Основные модели: `Sport`, `Country`, `Championship`, `Team`, `Match`, `TimeScore`, `Shooter`,
+  `MatchEvent`, `ChampionshipStage`
 - Использует декларативный подход SQLAlchemy 2.0
 
 **schemas.py** (272 строки)
 - TypedDict структуры для типизации данных
-- Основные схемы: `SportBetexplorer`, `CountryBetexplorer`, `ChampionshipBetexplorer`, `TeamBetexplorer`, `MatchBetexplorer`
+- Основные схемы: `SportBetexplorer`, `CountryBetexplorer`, `ChampionshipBetexplorer`,
+  `TeamBetexplorer`, `MatchBetexplorer`
 - Перечисление видов спорта: `SportType` enum
 
 **crud.py** (908 строк)

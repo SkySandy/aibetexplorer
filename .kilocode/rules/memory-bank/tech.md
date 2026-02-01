@@ -49,7 +49,10 @@
 - **indent-style**: space (пробелы)
 
 Правила линтинга:
-- Включены все основные правила (E, F, W, B, Q, I, RUF, N, D, YTT, ANN, ASYNC, S, BLE, FBT, A, COM, C4, DTZ, EXE, FA, ISC, ICN, G, INP, PIE, PYI, PT, RSE, RET, SLF, SLOT, SIM, TID, TCH, INT, ARG, PTH, TD, FIX, ERA, PD, PGH, PL, TRY, FLY, NPY, AIR, PERF, FURB, LOG, T10, EM, T20, TC, DOC, UP)
+- Включены все основные правила (E, F, W, B, Q, I, RUF, N, D, YTT, ANN, ASYNC, S, BLE, FBT,
+  A, COM, C4, DTZ, EXE, FA, ISC, ICN, G, INP, PIE, PYI, PT, RSE, RET, SLF, SLOT, SIM, TID,
+  TCH, INT, ARG, PTH, TD, FIX, ERA, PD, PGH, PL, TRY, FLY, NPY, AIR, PERF, FURB, LOG, T10,
+  EM, T20, TC, DOC, UP)
 - Игнорируются: D203, D213, D107, ANN401, DOC201, FURB113
 
 ### app/config_new.py
@@ -224,7 +227,8 @@ CONFIG_DATABASE = {
 ### Индексы
 
 - Уникальные индексы на: sport_name, sport_url, country_name, team_url
-- Составные индексы на: championship (sport_id, country_id, championship_name, championship_years, championship_url)
+- Составные индексы на: championship (sport_id, country_id, championship_name, championship_years,
+  championship_url)
 - Индексы для производительности на: match_championship_id, time_match_id, shooter_match_id, event_match_id
 
 ## Запуск проекта
