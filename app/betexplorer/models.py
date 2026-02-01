@@ -119,7 +119,7 @@ class Championship(Base):
     country: Mapped[Country] = relationship('Country', back_populates='championship')
     match: Mapped[list[Match]] = relationship('Match', uselist=True, back_populates='championship')
     championship_stage: Mapped[list[ChampionshipStage]] = relationship('ChampionshipStage', uselist=True,
-                                                                         back_populates='championship')
+                                                                       back_populates='championship')
     sport: Mapped[Sport] = relationship('Sport', back_populates='championship')
 
 
@@ -151,10 +151,10 @@ class Team(Base):
 
     country: Mapped[Country | None] = relationship('Country', back_populates='team')
     sport: Mapped[Sport] = relationship('Sport', back_populates='team')
-    match: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.away_team_id]',
-                                                back_populates='away_team')
-    match_: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.home_team_id]',
-                                                 back_populates='home_team')
+    away_matches: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.away_team_id]',
+                                                     back_populates='away_team')
+    home_matches: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.home_team_id]',
+                                                     back_populates='home_team')
 
 
 class Match(Base):
@@ -210,15 +210,15 @@ class Match(Base):
     save_date: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, comment='Дата обновления информации')  # noqa: E501
 
     championship: Mapped[Championship] = relationship('Championship', back_populates='match')
-    home_team: Mapped[Team] = relationship('Team', foreign_keys=[home_team_id], back_populates='match_')
-    away_team: Mapped[Team] = relationship('Team', foreign_keys=[away_team_id], back_populates='match')
+    home_team: Mapped[Team] = relationship('Team', foreign_keys=[home_team_id], back_populates='home_matches')
+    away_team: Mapped[Team] = relationship('Team', foreign_keys=[away_team_id], back_populates='away_matches')
     time_score: Mapped[list[TimeScore]] = relationship('TimeScore', uselist=True, back_populates='match')
     shooter: Mapped[list[Shooter]] = relationship('Shooter', uselist=True, back_populates='match')
     match_event: Mapped[list[MatchEvent]] = relationship('MatchEvent', uselist=True, back_populates='match')
 
 
 class TimeScore(Base):
-    """Результаты по таймам."""
+    """Результаты по таймам (только для сыгранных матчей)."""
 
     __tablename__ = 'time_score'
     # __table_args__ = {'schema': 'betexplorer'}  # noqa: ERA001
