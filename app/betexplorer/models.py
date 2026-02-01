@@ -34,6 +34,7 @@ class Sport(Base):
 
     sport_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор вида спорта',
     )
@@ -48,9 +49,9 @@ class Sport(Base):
         comment='Ссылка на страницу вида спорта',
     )
 
-    country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', uselist=True, back_populates='sport')
-    championship: Mapped[list[Championship]] = relationship('Championship', uselist=True, back_populates='sport')
-    team: Mapped[list[Team]] = relationship('Team', uselist=True, back_populates='sport')
+    country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', back_populates='sport')
+    championship: Mapped[list[Championship]] = relationship('Championship', back_populates='sport')
+    team: Mapped[list[Team]] = relationship('Team', back_populates='sport')
 
 
 class Country(Base):
@@ -80,9 +81,9 @@ class Country(Base):
         comment='Ссылка на флаг страны',
     )
 
-    country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', uselist=True, back_populates='country')
-    championship: Mapped[list[Championship]] = relationship('Championship', uselist=True, back_populates='country')
-    team: Mapped[list[Team]] = relationship('Team', uselist=True, back_populates='country')
+    country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', back_populates='country')
+    championship: Mapped[list[Championship]] = relationship('Championship', back_populates='country')
+    team: Mapped[list[Team]] = relationship('Team', back_populates='country')
 
 
 class CountrySport(Base):
@@ -172,8 +173,8 @@ class Championship(Base):
     )
 
     country: Mapped[Country] = relationship('Country', back_populates='championship')
-    match: Mapped[list[Match]] = relationship('Match', uselist=True, back_populates='championship')
-    championship_stage: Mapped[list[ChampionshipStage]] = relationship('ChampionshipStage', uselist=True,
+    match: Mapped[list[Match]] = relationship('Match', back_populates='championship')
+    championship_stage: Mapped[list[ChampionshipStage]] = relationship('ChampionshipStage',
                                                                        back_populates='championship')
     sport: Mapped[Sport] = relationship('Sport', back_populates='championship')
 
@@ -239,9 +240,9 @@ class Team(Base):
 
     country: Mapped[Country | None] = relationship('Country', back_populates='team')
     sport: Mapped[Sport] = relationship('Sport', back_populates='team')
-    away_matches: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.away_team_id]',
+    away_matches: Mapped[list[Match]] = relationship('Match', foreign_keys='Match.away_team_id',
                                                      back_populates='away_team')
-    home_matches: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.home_team_id]',
+    home_matches: Mapped[list[Match]] = relationship('Match', foreign_keys='Match.home_team_id',
                                                      back_populates='home_team')
 
 
@@ -367,11 +368,11 @@ class Match(Base):
     )
 
     championship: Mapped[Championship] = relationship('Championship', back_populates='match')
-    home_team: Mapped[Team] = relationship('Team', foreign_keys=[home_team_id], back_populates='home_matches')
-    away_team: Mapped[Team] = relationship('Team', foreign_keys=[away_team_id], back_populates='away_matches')
-    time_score: Mapped[list[TimeScore]] = relationship('TimeScore', uselist=True, back_populates='match')
-    shooter: Mapped[list[Shooter]] = relationship('Shooter', uselist=True, back_populates='match')
-    match_event: Mapped[list[MatchEvent]] = relationship('MatchEvent', uselist=True, back_populates='match')
+    home_team: Mapped[Team] = relationship('Team', foreign_keys='Match.home_team_id', back_populates='home_matches')
+    away_team: Mapped[Team] = relationship('Team', foreign_keys='Match.away_team_id', back_populates='away_matches')
+    time_score: Mapped[list[TimeScore]] = relationship('TimeScore', back_populates='match')
+    shooter: Mapped[list[Shooter]] = relationship('Shooter', back_populates='match')
+    match_event: Mapped[list[MatchEvent]] = relationship('MatchEvent', back_populates='match')
 
 
 class TimeScore(Base):
