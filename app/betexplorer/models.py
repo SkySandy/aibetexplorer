@@ -60,7 +60,7 @@ class Country(Base):
     country_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                             autoincrement=True, comment='Идентификатор страны')
     country_name: Mapped[str] = mapped_column(String(255), nullable=False, comment='Название страны')
-    country_flag_url: Mapped[str] = mapped_column(String(255), nullable=True, comment='Ссылка на флаг страны')
+    country_flag_url: Mapped[str] = mapped_column(String(255), nullable=False, comment='Ссылка на флаг страны')
 
     country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', uselist=True, back_populates='country')
     championship: Mapped[list[Championship]] = relationship('Championship', uselist=True, back_populates='country')
