@@ -61,7 +61,7 @@
 
 #### База данных
 ```python
-SQLALCHEMY_DATABASE_URI = 'postgresql+asyncpg://postgres:11111@localhost:5432/test44'
+SQLALCHEMY_DATABASE_URI = 'postgresql+asyncpg://postgres:517217@localhost:5432/test77'
 ```
 
 #### Каталоги
