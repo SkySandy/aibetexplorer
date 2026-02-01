@@ -14,6 +14,7 @@ from sqlalchemy import (
     String,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.schema import Identity
 
 from app.database import Base
 
@@ -64,6 +65,7 @@ class Country(Base):
 
     country_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор страны',
     )
@@ -96,6 +98,7 @@ class CountrySport(Base):
 
     sport_id: Mapped[int] = mapped_column(
         Integer,
+        primary_key=True,
         comment='Идентификатор вида спорта',
     )
     country_id: Mapped[int] = mapped_column(
@@ -133,6 +136,7 @@ class Championship(Base):
 
     championship_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор чемпионата',
     )
@@ -188,6 +192,7 @@ class Team(Base):
 
     team_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор команды',
     )
@@ -255,6 +260,7 @@ class Match(Base):
 
     match_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор матча',
     )
@@ -381,6 +387,7 @@ class TimeScore(Base):
 
     time_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор тайма',
     )
@@ -419,6 +426,7 @@ class Shooter(Base):
 
     shooter_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор гола',
     )
@@ -473,6 +481,7 @@ class ChampionshipStage(Base):
 
     stage_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор стадии чемпионата',
     )
@@ -518,6 +527,7 @@ class MatchEvent(Base):
 
     match_event_id: Mapped[int] = mapped_column(
         Integer,
+        Identity(start=1),
         primary_key=True,
         comment='Идентификатор события в матче',
     )
