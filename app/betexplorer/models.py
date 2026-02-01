@@ -2,13 +2,12 @@
 """Описания таблиц системы."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from datetime import datetime  # noqa: TC003
 
 from sqlalchemy import (
     DateTime,
     Float,
     ForeignKeyConstraint,
-    Identity,
     Index,
     Integer,
     PrimaryKeyConstraint,
@@ -17,9 +16,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-
-if TYPE_CHECKING:
-    import datetime
 
 PrimaryKeyConstraint.argument_for('postgresql', 'fillfactor', None)
 
@@ -38,7 +34,8 @@ class Sport(Base):
     sport_id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
-        comment='Идентификатор вида спорта')
+        comment='Идентификатор вида спорта',
+    )
     sport_name: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
@@ -67,9 +64,7 @@ class Country(Base):
 
     country_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор страны',
     )
     country_name: Mapped[str] = mapped_column(
@@ -101,7 +96,6 @@ class CountrySport(Base):
 
     sport_id: Mapped[int] = mapped_column(
         Integer,
-        primary_key=True,
         comment='Идентификатор вида спорта',
     )
     country_id: Mapped[int] = mapped_column(
@@ -111,7 +105,8 @@ class CountrySport(Base):
     )
     country_url: Mapped[str] = mapped_column(
         String(255),
-        nullable=False,comment='Ссылка на страницу всех чемпионатов для страны по виду спорта',
+        nullable=False,
+        comment='Ссылка на страницу всех чемпионатов для страны по виду спорта',
     )
     country_order: Mapped[int] = mapped_column(
         Integer,
@@ -138,9 +133,7 @@ class Championship(Base):
 
     championship_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор чемпионата',
     )
     sport_id: Mapped[int] = mapped_column(
@@ -155,7 +148,8 @@ class Championship(Base):
     )
     championship_name: Mapped[str] = mapped_column(
         String(255),
-        nullable=False,comment='Название чемпионата',
+        nullable=False,
+        comment='Название чемпионата',
     )
     championship_url: Mapped[str] = mapped_column(
         String(255),
@@ -194,9 +188,7 @@ class Team(Base):
 
     team_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор команды',
     )
     sport_id: Mapped[int] = mapped_column(
@@ -229,12 +221,12 @@ class Team(Base):
         nullable=True,
         comment='Ссылка на эмблему команды',
     )
-    download_date: Mapped[datetime.datetime] = mapped_column(
+    download_date: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         comment='Дата загрузки информации',
     )
-    save_date: Mapped[datetime.datetime] = mapped_column(
+    save_date: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         comment='Дата сохранения информации в базе данных',
@@ -263,9 +255,7 @@ class Match(Base):
 
     match_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор матча',
     )
     championship_id: Mapped[int] = mapped_column(
@@ -324,7 +314,7 @@ class Match(Base):
         nullable=True,
         comment='Коэффициент на победу гостей',
     )
-    game_date: Mapped[datetime.datetime] = mapped_column(
+    game_date: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         comment='Дата игры',
@@ -359,12 +349,12 @@ class Match(Base):
         nullable=True,
         comment='Номер тура',
     )
-    download_date: Mapped[datetime.datetime] = mapped_column(
+    download_date: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         comment='Дата загрузки информации',
     )
-    save_date: Mapped[datetime.datetime] = mapped_column(
+    save_date: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
         comment='Дата обновления информации',
@@ -391,9 +381,7 @@ class TimeScore(Base):
 
     time_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор тайма',
     )
     match_id: Mapped[int] = mapped_column(
@@ -431,9 +419,7 @@ class Shooter(Base):
 
     shooter_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор гола',
     )
     match_id: Mapped[int] = mapped_column(
@@ -487,9 +473,7 @@ class ChampionshipStage(Base):
 
     stage_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор стадии чемпионата',
     )
     championship_id: Mapped[int] = mapped_column(
@@ -534,9 +518,7 @@ class MatchEvent(Base):
 
     match_event_id: Mapped[int] = mapped_column(
         Integer,
-        Identity(start=1),
         primary_key=True,
-        autoincrement=True,
         comment='Идентификатор события в матче',
     )
     match_id: Mapped[int] = mapped_column(
