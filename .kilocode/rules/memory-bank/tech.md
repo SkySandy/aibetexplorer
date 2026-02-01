@@ -196,7 +196,7 @@ CONFIG_DATABASE = {
    - download_date
    - save_date
 
-8. **time_score** - результаты по таймам
+8. **time_score** - результаты по таймам (только для сыгранных матчей)
    - time_id (PK, Identity)
    - match_id (FK)
    - half_number
