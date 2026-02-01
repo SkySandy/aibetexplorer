@@ -1,5 +1,8 @@
+# ruff: noqa: I001
 """Описания таблиц системы."""
-from typing import TYPE_CHECKING, List
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DateTime,
@@ -38,9 +41,9 @@ class Sport(Base):
     sport_name: Mapped[str] = mapped_column(String(255), nullable=False, comment='Название вида спорта')
     sport_url: Mapped[str] = mapped_column(String(255), nullable=False, comment='Ссылка на страницу вида спорта')
 
-    country_sport: Mapped[List['CountrySport']] = relationship('CountrySport', uselist=True, back_populates='sport')
-    championship: Mapped[List['Championship']] = relationship('Championship', uselist=True, back_populates='sport')
-    team: Mapped[List['Team']] = relationship('Team', uselist=True, back_populates='sport')
+    country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', uselist=True, back_populates='sport')
+    championship: Mapped[list[Championship]] = relationship('Championship', uselist=True, back_populates='sport')
+    team: Mapped[list[Team]] = relationship('Team', uselist=True, back_populates='sport')
 
 
 class Country(Base):
@@ -59,9 +62,9 @@ class Country(Base):
     country_name: Mapped[str] = mapped_column(String(255), nullable=False, comment='Название страны')
     country_flag_url: Mapped[str] = mapped_column(String(255), nullable=True, comment='Ссылка на флаг страны')
 
-    country_sport: Mapped[List['CountrySport']] = relationship('CountrySport', uselist=True, back_populates='country')
-    championship: Mapped[List['Championship']] = relationship('Championship', uselist=True, back_populates='country')
-    team: Mapped[List['Team']] = relationship('Team', uselist=True, back_populates='country')
+    country_sport: Mapped[list[CountrySport]] = relationship('CountrySport', uselist=True, back_populates='country')
+    championship: Mapped[list[Championship]] = relationship('Championship', uselist=True, back_populates='country')
+    team: Mapped[list[Team]] = relationship('Team', uselist=True, back_populates='country')
 
 
 class CountrySport(Base):
@@ -83,8 +86,8 @@ class CountrySport(Base):
                                              comment='Ссылка на страницу всех чемпионатов для страны по виду спорта')
     country_order: Mapped[int] = mapped_column(Integer, nullable=False, comment='Номер по порядку вывода страны')
 
-    country: Mapped['Country'] = relationship('Country', back_populates='country_sport')
-    sport: Mapped['Sport'] = relationship('Sport', back_populates='country_sport')
+    country: Mapped[Country] = relationship('Country', back_populates='country_sport')
+    sport: Mapped[Sport] = relationship('Sport', back_populates='country_sport')
 
 
 class Championship(Base):
@@ -101,24 +104,24 @@ class Championship(Base):
         {'comment': 'Чемпионаты'},
     )
 
-    championship_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False,
-                                                       primary_key=True,
-                                                       autoincrement=True, comment='Идентификатор чемпионата')
-    sport_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор вида спорта')
-    country_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор страны')
-    championship_name: Mapped[str | None] = mapped_column(String(255), nullable=False,
-                                                           comment='Название чемпионата')
-    championship_url: Mapped[str | None] = mapped_column(String(255), nullable=False,
-                                                          comment='Ссылка на страницу чемпионата для вида спорта')
-    championship_order: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                            comment='Номер по порядку вывода чемпионата')
-    championship_years: Mapped[str | None] = mapped_column(String(255), nullable=False, comment='Годы проведения')
+    championship_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False,
+                                                  primary_key=True,
+                                                  autoincrement=True, comment='Идентификатор чемпионата')
+    sport_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор вида спорта')
+    country_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор страны')
+    championship_name: Mapped[str] = mapped_column(String(255), nullable=False,
+                                                     comment='Название чемпионата')
+    championship_url: Mapped[str] = mapped_column(String(255), nullable=False,
+                                                    comment='Ссылка на страницу чемпионата для вида спорта')
+    championship_order: Mapped[int] = mapped_column(Integer, nullable=False,
+                                                      comment='Номер по порядку вывода чемпионата')
+    championship_years: Mapped[str] = mapped_column(String(255), nullable=False, comment='Годы проведения')
 
-    country: Mapped['Country'] = relationship('Country', back_populates='championship')
-    match: Mapped[List['Match']] = relationship('Match', uselist=True, back_populates='championship')
-    championship_stage: Mapped[List['ChampionshipStage']] = relationship('ChampionshipStage', uselist=True,
+    country: Mapped[Country] = relationship('Country', back_populates='championship')
+    match: Mapped[list[Match]] = relationship('Match', uselist=True, back_populates='championship')
+    championship_stage: Mapped[list[ChampionshipStage]] = relationship('ChampionshipStage', uselist=True,
                                                                          back_populates='championship')
-    sport: Mapped['Sport'] = relationship('Sport', back_populates='championship')
+    sport: Mapped[Sport] = relationship('Sport', back_populates='championship')
 
 
 class Team(Base):
@@ -134,24 +137,24 @@ class Team(Base):
         {'comment': 'Команды'},
     )
 
-    team_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
-                                                autoincrement=True, comment='Идентификатор команды')
-    sport_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор вида спорта')
+    team_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                          autoincrement=True, comment='Идентификатор команды')
+    sport_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор вида спорта')
     country_id: Mapped[int | None] = mapped_column(Integer, nullable=True, comment='Идентификатор страны')
-    team_name: Mapped[str | None] = mapped_column(String(255), nullable=False, comment='Название команды')
+    team_name: Mapped[str] = mapped_column(String(255), nullable=False, comment='Название команды')
     team_full: Mapped[str | None] = mapped_column(String(255), nullable=True, comment='Название команды (полное)')
     team_url: Mapped[str | None] = mapped_column(String(255), nullable=True,
                                                  comment='Ссылка на страницу команды')
     team_emblem: Mapped[str | None] = mapped_column(String(255), nullable=True,
                                                     comment='Ссылка на эмблему команды')
-    download_date: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=False, comment='Дата загрузки информации')  # noqa: E501
-    save_date: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=False, comment='Дата сохранения информации в базе данных')  # noqa: E501
+    download_date: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, comment='Дата загрузки информации')  # noqa: E501
+    save_date: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, comment='Дата сохранения информации в базе данных')  # noqa: E501
 
-    country: Mapped['Country' | None] = relationship('Country', back_populates='team')
-    sport: Mapped['Sport'] = relationship('Sport', back_populates='team')
-    match: Mapped[List['Match']] = relationship('Match', uselist=True, foreign_keys='[Match.away_team_id]',
+    country: Mapped[Country | None] = relationship('Country', back_populates='team')
+    sport: Mapped[Sport] = relationship('Sport', back_populates='team')
+    match: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.away_team_id]',
                                                 back_populates='away_team')
-    match_: Mapped[List['Match']] = relationship('Match', uselist=True, foreign_keys='[Match.home_team_id]',
+    match_: Mapped[list[Match]] = relationship('Match', uselist=True, foreign_keys='[Match.home_team_id]',
                                                  back_populates='home_team')
 
 
@@ -169,19 +172,19 @@ class Match(Base):
         {'comment': 'Матчи'},
     )
 
-    match_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
-                                                 autoincrement=True, comment='Идентификатор матча')
-    championship_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор чемпионата')
-    match_url: Mapped[str | None] = mapped_column(String(255), nullable=False, comment='Ссылка на матч')
+    match_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                           autoincrement=True, comment='Идентификатор матча')
+    championship_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор чемпионата')
+    match_url: Mapped[str] = mapped_column(String(255), nullable=False, comment='Ссылка на матч')
 
-    home_team_id: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                     comment='Идентификатор домашней команды')
+    home_team_id: Mapped[int] = mapped_column(Integer, nullable=False,
+                                               comment='Идентификатор домашней команды')
     home_team_emblem: Mapped[str | None] = mapped_column(String(255), nullable=True,
-                                                         comment='Ссылка на эмблему команды')
-    away_team_id: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                     comment='Идентификатор команды гостей')
+                                                          comment='Ссылка на эмблему команды')
+    away_team_id: Mapped[int] = mapped_column(Integer, nullable=False,
+                                               comment='Идентификатор команды гостей')
     away_team_emblem: Mapped[str | None] = mapped_column(String(255), nullable=True,
-                                                         comment='Ссылка на эмблему команды')
+                                                          comment='Ссылка на эмблему команды')
     home_score: Mapped[int | None] = mapped_column(Integer, nullable=True,
                                                     comment='Количество голов забитых домашней командой')
     away_score: Mapped[int | None] = mapped_column(Integer, nullable=True,
@@ -191,28 +194,28 @@ class Match(Base):
     odds_x: Mapped[float | None] = mapped_column(Float, nullable=True, comment='Коэффициент на ничью')
     odds_2: Mapped[float | None] = mapped_column(Float, nullable=True, comment='Коэффициент на победу гостей')
 
-    game_date: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=False, comment='Дата игры')
+    game_date: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, comment='Дата игры')
     score_stage: Mapped[str | None] = mapped_column(String(255), nullable=True,
                                                      comment='Примечания к результату матча (победа по пенальти, игра прервалась и прочие)')  # noqa: E501
     score_stage_short: Mapped[str | None] = mapped_column(String(255), nullable=True,
                                                           comment='Примечание к результату в кратком виде')
 
-    is_fixture: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                    comment='Строка это результат (0) или расписание (1)')
+    is_fixture: Mapped[int] = mapped_column(Integer, nullable=False,
+                                              comment='Строка это результат (0) или расписание (1)')
     stage_name: Mapped[str | None] = mapped_column(String(255), nullable=True,
                                                     comment='Стадия чемпионата (квалификация, групповой этап и прочие)')  # noqa: E501
     round_name: Mapped[str | None] = mapped_column(String(255), nullable=True, comment='Название тура')
     round_number: Mapped[int | None] = mapped_column(Integer, nullable=True, comment='Номер тура')
 
-    download_date: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=False, comment='Дата загрузки информации')  # noqa: E501
-    save_date: Mapped[datetime.datetime | None] = mapped_column(DateTime, nullable=False, comment='Дата обновления информации')  # noqa: E501
+    download_date: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, comment='Дата загрузки информации')  # noqa: E501
+    save_date: Mapped[datetime.datetime] = mapped_column(DateTime, nullable=False, comment='Дата обновления информации')  # noqa: E501
 
-    championship: Mapped['Championship'] = relationship('Championship', back_populates='match')
-    home_team: Mapped['Team'] = relationship('Team', foreign_keys=[home_team_id], back_populates='match_')
-    away_team: Mapped['Team'] = relationship('Team', foreign_keys=[away_team_id], back_populates='match')
-    time_score: Mapped[List['TimeScore']] = relationship('TimeScore', uselist=True, back_populates='match')
-    shooter: Mapped[List['Shooter']] = relationship('Shooter', uselist=True, back_populates='match')
-    match_event: Mapped[List['Shooter']] = relationship('MatchEvent', uselist=True, back_populates='match')
+    championship: Mapped[Championship] = relationship('Championship', back_populates='match')
+    home_team: Mapped[Team] = relationship('Team', foreign_keys=[home_team_id], back_populates='match_')
+    away_team: Mapped[Team] = relationship('Team', foreign_keys=[away_team_id], back_populates='match')
+    time_score: Mapped[list[TimeScore]] = relationship('TimeScore', uselist=True, back_populates='match')
+    shooter: Mapped[list[Shooter]] = relationship('Shooter', uselist=True, back_populates='match')
+    match_event: Mapped[list[MatchEvent]] = relationship('MatchEvent', uselist=True, back_populates='match')
 
 
 class TimeScore(Base):
@@ -227,16 +230,16 @@ class TimeScore(Base):
         {'comment': 'Результаты по таймам'},
     )
 
-    time_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
-                                                autoincrement=True, comment='Идентификатор тайма')
-    match_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
-    half_number: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Номер тайма')
-    home_score: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                   comment='Количество голов забитых домашней командой')
-    away_score: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                   comment='Количество голов забитых командой гостей')
+    time_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                          autoincrement=True, comment='Идентификатор тайма')
+    match_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
+    half_number: Mapped[int] = mapped_column(Integer, nullable=False, comment='Номер тайма')
+    home_score: Mapped[int] = mapped_column(Integer, nullable=False,
+                                             comment='Количество голов забитых домашней командой')
+    away_score: Mapped[int] = mapped_column(Integer, nullable=False,
+                                             comment='Количество голов забитых командой гостей')
 
-    match: Mapped['Match'] = relationship('Match', back_populates='time_score')
+    match: Mapped[Match] = relationship('Match', back_populates='time_score')
 
 
 class Shooter(Base):
@@ -247,22 +250,22 @@ class Shooter(Base):
     __table_args__ = (
         PrimaryKeyConstraint('shooter_id', name='shooter_pkey', postgresql_fillfactor=50),
         ForeignKeyConstraint(['match_id'], ['match.match_id'], name='fk_shooter_match'),
-        Index('shooter_imatch_id', 'match_id', unique=False),
+        Index('shooter_match_id', 'match_id', unique=False),
         {'comment': 'Голы и минуты'},
     )
 
-    shooter_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
-                                                    autoincrement=True, comment='Идентификатор гола')
-    match_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
-    home_away: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                  comment='Событие домашней (0) или гостевой (1) команды')
+    shooter_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                             autoincrement=True, comment='Идентификатор гола')
+    match_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
+    home_away: Mapped[int] = mapped_column(Integer, nullable=False,
+                                           comment='Событие домашней (0) или гостевой (1) команды')
     event_time: Mapped[str | None] = mapped_column(String(255), nullable=True, comment='Время гола')
     overtime: Mapped[str | None] = mapped_column(String(255), nullable=True, comment='Дополнительное время')
     player_name: Mapped[str | None] = mapped_column(String(255), nullable=True, comment='Фамилия игрока')
     penalty_kick: Mapped[str | None] = mapped_column(String(255), nullable=True, comment='Гол забит с пенальти')
     event_order: Mapped[int | None] = mapped_column(Integer, nullable=True, comment='Порядковый номер события')
 
-    match: Mapped['Match'] = relationship('Match', back_populates='shooter')
+    match: Mapped[Match] = relationship('Match', back_populates='shooter')
 
 
 class ChampionshipStage(Base):
@@ -276,18 +279,18 @@ class ChampionshipStage(Base):
         {'comment': 'Стадии чемпионата'},
     )
 
-    stage_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
-                                                  autoincrement=True, comment='Идентификатор стадии чемпионата')
-    championship_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор чемпионата')
-    stage_url: Mapped[str | None] = mapped_column(String(255), nullable=False,
-                                                  comment='Ссылка на страницу стадии чемпионата')
-    stage_name: Mapped[str | None] = mapped_column(String(255), nullable=False,
-                                                   comment='Название стадии чемпионата')
-    stage_order: Mapped[int | None] = mapped_column(Integer, nullable=False,
-                                                    comment='Номер по порядку стадии чемпионата')
-    stage_current: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Текущая стадия')
+    stage_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                           autoincrement=True, comment='Идентификатор стадии чемпионата')
+    championship_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор чемпионата')
+    stage_url: Mapped[str] = mapped_column(String(255), nullable=False,
+                                             comment='Ссылка на страницу стадии чемпионата')
+    stage_name: Mapped[str] = mapped_column(String(255), nullable=False,
+                                              comment='Название стадии чемпионата')
+    stage_order: Mapped[int] = mapped_column(Integer, nullable=False,
+                                               comment='Номер по порядку стадии чемпионата')
+    stage_current: Mapped[int] = mapped_column(Integer, nullable=False, comment='Текущая стадия')
 
-    championship: Mapped['Championship'] = relationship('Championship', back_populates='championship_stage')
+    championship: Mapped[Championship] = relationship('Championship', back_populates='championship_stage')
 
 
 class MatchEvent(Base):
@@ -302,13 +305,13 @@ class MatchEvent(Base):
         {'comment': 'События в матче'},
     )
 
-    match_event_id: Mapped[int | None] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
-                                                       autoincrement=True, comment='Идентификатор события в матче')
-    match_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
-    event_type_id: Mapped[int | None] = mapped_column(Integer, nullable=False, comment='Идентификатор типа события')
+    match_event_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+                                                 autoincrement=True, comment='Идентификатор события в матче')
+    match_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
+    event_type_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор типа события')
     indicator: Mapped[str | None] = mapped_column(String(255), nullable=True,
                                                    comment='Значение показателя (тотала, форы)')
     odds_less: Mapped[float | None] = mapped_column(Float, nullable=True, comment='Коэффициент на меньше')
     odds_greater: Mapped[float | None] = mapped_column(Float, nullable=True, comment='Коэффициент на больше')
 
-    match: Mapped['Match'] = relationship('Match', back_populates='match_event')
+    match: Mapped[Match] = relationship('Match', back_populates='match_event')
