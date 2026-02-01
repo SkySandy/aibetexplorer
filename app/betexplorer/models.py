@@ -36,7 +36,7 @@ class Sport(Base):
         {'comment': 'Виды спорта'},
     )
 
-    sport_id: Mapped[int] = mapped_column(Integer,
+    sport_id: Mapped[int] = mapped_column(Integer, primary_key=True,
                                           comment='Идентификатор вида спорта')
     sport_name: Mapped[str] = mapped_column(String(255), nullable=False, comment='Название вида спорта')
     sport_url: Mapped[str] = mapped_column(String(255), nullable=False, comment='Ссылка на страницу вида спорта')
@@ -57,7 +57,7 @@ class Country(Base):
         {'comment': 'Страны'},
     )
 
-    country_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    country_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                             autoincrement=True, comment='Идентификатор страны')
     country_name: Mapped[str] = mapped_column(String(255), nullable=False, comment='Название страны')
     country_flag_url: Mapped[str] = mapped_column(String(255), nullable=True, comment='Ссылка на флаг страны')
@@ -79,9 +79,9 @@ class CountrySport(Base):
         {'comment': 'Виды спорта по стране'},
     )
 
-    sport_id: Mapped[int] = mapped_column(Integer, nullable=False, primary_key=True,
+    sport_id: Mapped[int] = mapped_column(Integer, primary_key=True,
                                           comment='Идентификатор вида спорта')
-    country_id: Mapped[int] = mapped_column(Integer, nullable=False, primary_key=True, comment='Идентификатор страны')
+    country_id: Mapped[int] = mapped_column(Integer, primary_key=True, comment='Идентификатор страны')
     country_url: Mapped[str] = mapped_column(String(255), nullable=False,
                                              comment='Ссылка на страницу всех чемпионатов для страны по виду спорта')
     country_order: Mapped[int] = mapped_column(Integer, nullable=False, comment='Номер по порядку вывода страны')
@@ -104,8 +104,7 @@ class Championship(Base):
         {'comment': 'Чемпионаты'},
     )
 
-    championship_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False,
-                                                  primary_key=True,
+    championship_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                                   autoincrement=True, comment='Идентификатор чемпионата')
     sport_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор вида спорта')
     country_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор страны')
@@ -137,7 +136,7 @@ class Team(Base):
         {'comment': 'Команды'},
     )
 
-    team_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    team_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                           autoincrement=True, comment='Идентификатор команды')
     sport_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор вида спорта')
     country_id: Mapped[int | None] = mapped_column(Integer, nullable=True, comment='Идентификатор страны')
@@ -172,7 +171,7 @@ class Match(Base):
         {'comment': 'Матчи'},
     )
 
-    match_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    match_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                            autoincrement=True, comment='Идентификатор матча')
     championship_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор чемпионата')
     match_url: Mapped[str] = mapped_column(String(255), nullable=False, comment='Ссылка на матч')
@@ -230,7 +229,7 @@ class TimeScore(Base):
         {'comment': 'Результаты по таймам'},
     )
 
-    time_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    time_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                           autoincrement=True, comment='Идентификатор тайма')
     match_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
     half_number: Mapped[int] = mapped_column(Integer, nullable=False, comment='Номер тайма')
@@ -254,7 +253,7 @@ class Shooter(Base):
         {'comment': 'Голы и минуты'},
     )
 
-    shooter_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    shooter_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                              autoincrement=True, comment='Идентификатор гола')
     match_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
     home_away: Mapped[int] = mapped_column(Integer, nullable=False,
@@ -279,7 +278,7 @@ class ChampionshipStage(Base):
         {'comment': 'Стадии чемпионата'},
     )
 
-    stage_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    stage_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                            autoincrement=True, comment='Идентификатор стадии чемпионата')
     championship_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор чемпионата')
     stage_url: Mapped[str] = mapped_column(String(255), nullable=False,
@@ -305,7 +304,7 @@ class MatchEvent(Base):
         {'comment': 'События в матче'},
     )
 
-    match_event_id: Mapped[int] = mapped_column(Integer, Identity(start=1), nullable=False, primary_key=True,
+    match_event_id: Mapped[int] = mapped_column(Integer, Identity(start=1), primary_key=True,
                                                  autoincrement=True, comment='Идентификатор события в матче')
     match_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор матча')
     event_type_id: Mapped[int] = mapped_column(Integer, nullable=False, comment='Идентификатор типа события')
