@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from datetime import datetime  # noqa: TC003
+from decimal import Decimal  # noqa: TC003
 
 from sqlalchemy import (
     DateTime,
-    Float,
     ForeignKeyConstraint,
     Index,
     Integer,
@@ -307,18 +307,18 @@ class Match(Base):
         nullable=True,
         comment='Количество голов забитых командой гостей',
     )
-    odds_1: Mapped[float | None] = mapped_column(
-        Numeric,
+    odds_1: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 3),
         nullable=True,
         comment='Коэффициент на победу хозяев',
     )
-    odds_x: Mapped[float | None] = mapped_column(
-        Numeric,
+    odds_x: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 3),
         nullable=True,
         comment='Коэффициент на ничью',
     )
-    odds_2: Mapped[float | None] = mapped_column(
-        Numeric,
+    odds_2: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 3),
         nullable=True,
         comment='Коэффициент на победу гостей',
     )
@@ -548,13 +548,13 @@ class MatchEvent(Base):
         nullable=True,
         comment='Значение показателя (тотала, форы)',
     )
-    odds_less: Mapped[float | None] = mapped_column(
-        Numeric,
+    odds_less: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 3),
         nullable=True,
         comment='Коэффициент на меньше',
     )
-    odds_greater: Mapped[float | None] = mapped_column(
-        Numeric,
+    odds_greater: Mapped[Decimal | None] = mapped_column(
+        Numeric(8, 3),
         nullable=True,
         comment='Коэффициент на больше',
     )
