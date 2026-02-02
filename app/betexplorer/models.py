@@ -10,6 +10,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    Numeric,
     PrimaryKeyConstraint,
     String,
 )
@@ -307,17 +308,17 @@ class Match(Base):
         comment='Количество голов забитых командой гостей',
     )
     odds_1: Mapped[float | None] = mapped_column(
-        Float,
+        Numeric,
         nullable=True,
         comment='Коэффициент на победу хозяев',
     )
     odds_x: Mapped[float | None] = mapped_column(
-        Float,
+        Numeric,
         nullable=True,
         comment='Коэффициент на ничью',
     )
     odds_2: Mapped[float | None] = mapped_column(
-        Float,
+        Numeric,
         nullable=True,
         comment='Коэффициент на победу гостей',
     )
@@ -548,12 +549,12 @@ class MatchEvent(Base):
         comment='Значение показателя (тотала, форы)',
     )
     odds_less: Mapped[float | None] = mapped_column(
-        Float,
+        Numeric,
         nullable=True,
         comment='Коэффициент на меньше',
     )
     odds_greater: Mapped[float | None] = mapped_column(
-        Float,
+        Numeric,
         nullable=True,
         comment='Коэффициент на больше',
     )
